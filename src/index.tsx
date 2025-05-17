@@ -8,6 +8,7 @@ import './index.css';
 import App from './App';
 import './assets/styles/auth.css';
 import './assets/styles/admin.css';
+import './assets/styles/profile.css';
 
 
 const root = ReactDOM.createRoot(

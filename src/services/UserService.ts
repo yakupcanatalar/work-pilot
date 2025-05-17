@@ -1,7 +1,7 @@
 // services/authService.ts
 import axios from "axios";
 import { UserData} from "../types/UserData";
-import { ErrorResponse } from "../types/ErrorResponse";
+// import { ErrorResponse } from "../types/ErrorResponse";
 import { AuthResponse } from "../types/AuthResponse";   
 import { LoginData } from "../types/LoginData";
 

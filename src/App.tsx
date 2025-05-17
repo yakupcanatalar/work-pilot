@@ -9,6 +9,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ContactPage from "./pages/ContactPage";
 import AdminLayout from "./layouts/AdminLayout";
 import DashboardPage from "./pages/admin/DashboardPage";
+import ProfilePage from "./pages/admin/ProfilePage";
 // Diğer admin sayfalarını da import edebilirsin
 
 const AppContent: React.FC = () => {
@@ -24,7 +25,7 @@ const AppContent: React.FC = () => {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            {/* Diğer admin alt route'larını buraya ekle */}
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
 
           {/* Public Routes */}

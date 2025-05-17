@@ -9,9 +9,11 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, icon }) => {
   return (
-    <div className="page-header d-flex align-items-center mb-4">
+    <div className="page-header d-flex flex-column justify-content-center align-items-center mb-4">
+      <div className="d-flex align-items-center">
       {icon && <FontAwesomeIcon icon={icon} className="me-2 text-primary fs-4" />}
       <h1 className="page-title m-0">{title}</h1>
+      </div>
     </div>
   );
 };
