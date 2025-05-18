@@ -28,9 +28,9 @@ const RegisterPage: React.FC = () => {
 
     try {
       const response = await registerUser(formData);
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
-      navigate('/login');
+      localStorage.setItem('accessToken', response.access_token);
+      localStorage.setItem('refreshToken', response.refresh_token);
+      navigate('/admin'); // Başarılı kayıt sonrası admin sayfasına yönlendir
     } catch (err: any) {
       const message = err.response?.data?.message || 'Kayıt sırasında bir hata oluştu';
       setError(message);

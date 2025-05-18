@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="admin-container">
+    <div>
       <Sidebar onLogout={handleLogout} />
       <div
         className="main-content"

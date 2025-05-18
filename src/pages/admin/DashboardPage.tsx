@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
+import { Row, Col, Card, Container } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
@@ -19,7 +19,7 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <div className="dashboard-page">
+    <Container className="py-4">
       <div>
         <PageHeader title="Dashboard" icon={faTachometerAlt} />
       </div>
@@ -69,7 +69,7 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
-    </div>
+    </Container>
   );
 };
 

@@ -8,7 +8,6 @@ import {
   faProjectDiagram,
   faTasks,
   faChartBar,
-  faCog,
   faAngleLeft,
   faAngleRight,
 } from '@fortawesome/free-solid-svg-icons';
@@ -55,15 +54,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
           <FontAwesomeIcon icon={faTachometerAlt} className="me-2" />
           {!collapsed && 'Dashboard'}
         </Nav.Link>
-        <Nav.Link as={Link} to="/admin/customers" className="mb-2 rounded" title="Müşteriler">
+        <Nav.Link as={Link} to="/admin/customer" className="mb-2 rounded" title="Müşteriler">
           <FontAwesomeIcon icon={faUsers} className="me-2" />
           {!collapsed && 'Müşteriler'}
         </Nav.Link>
-        <Nav.Link as={Link} to="/admin/workflows" className="mb-2 rounded" title="İş Akışları">
+        <Nav.Link as={Link} to="/admin/work-flow" className="mb-2 rounded" title="İş Akışları">
           <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />
           {!collapsed && 'İş Akışları'}
         </Nav.Link>
-        <Nav.Link as={Link} to="/admin/tasks" className="mb-2 rounded" title="Görevler">
+        <Nav.Link as={Link} to="/admin/task" className="mb-2 rounded" title="Görevler">
           <FontAwesomeIcon icon={faTasks} className="me-2" />
           {!collapsed && 'Görevler'}
         </Nav.Link>
@@ -91,8 +90,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
             {!collapsed && <strong>Çağrı ATALAR</strong>}
           </Dropdown.Toggle>
           <Dropdown.Menu className="text-small shadow" aria-labelledby="dropdownUser2">
-            <Dropdown.Item as={Link} to="/admin/settings">Ayarlar</Dropdown.Item>
-            <Dropdown.Item as={Link} to="/admin/profile">Profilim</Dropdown.Item>
+            <Dropdown.Item className="mb-2 rounded" as={Link} to="/admin/settings">Ayarlar</Dropdown.Item>
+            <Dropdown.Item className="mb-2 rounded" as={Link} to="/admin/profile">Profilim</Dropdown.Item>
+            <Dropdown.Item className="mb-2 rounded" as={Link} to="/contact">Hata Bildir</Dropdown.Item>
+            <Dropdown.Item className="mb-2 rounded" as={Link} to="/about">S.S.S</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={onLogout}>Çıkış</Dropdown.Item>
           </Dropdown.Menu>

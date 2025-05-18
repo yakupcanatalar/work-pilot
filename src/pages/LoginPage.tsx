@@ -25,9 +25,9 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await loginUser(formData);
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
-      navigate('/');
+      localStorage.setItem('accessToken', response.access_token);
+      localStorage.setItem('refreshToken', response.refresh_token);
+      navigate('/admin'); // Başarılı girişte admin sayfasına yönlendir
     } catch (err: any) {
       const message = err.response?.data?.message || 'Giriş sırasında bir hata oluştu';
       setError(message);

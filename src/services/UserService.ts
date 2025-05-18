@@ -28,8 +28,16 @@ axiosInstance.interceptors.request.use(
 
 // ---------- Auth Functions ----------
 export const registerUser = async (userData: UserData): Promise<AuthResponse> => {
-  const response = await axiosInstance.post<AuthResponse>(`${AUTH_URL}/register`, userData);
-  return response.data;
+  try {
+    const response = await axiosInstance.post<AuthResponse>(`${AUTH_URL}/register`, userData);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error("Register error:", error.response.data);
+      throw error.response.data;
+    }
+    throw error;
+  }
 };
 
 export const loginUser = async (userData: LoginData): Promise<AuthResponse> => {
