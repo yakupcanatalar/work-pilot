@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Spinner } from 'react-bootstrap';
+import { Card, Row, Col, Spinner, Container } from 'react-bootstrap';
+import PageHeader from '../../components/PageHeader';
+import { faChartBar, faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
 
 interface StatisticsData {
   totalCustomers: number;
@@ -24,9 +26,11 @@ const StatisticsPage: React.FC = () => {
   }, []);
 
   return (
+        <Container className="py-4">
+      <PageHeader title="İstatistikler" icon={faChartBar} />
     <Card className="shadow-sm">
-      <Card.Header className="bg-info text-white">
-        <h5 className="mb-0">İstatistikler</h5>
+      <Card.Header>
+        <h5 className="mb-0">Başlık</h5>
       </Card.Header>
       <Card.Body>
         {loading ? (
@@ -81,6 +85,7 @@ const StatisticsPage: React.FC = () => {
         )}
       </Card.Body>
     </Card>
+    </Container>
   );
 };
 

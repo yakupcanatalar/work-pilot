@@ -1,5 +1,8 @@
+import { faWebflow } from '@fortawesome/free-brands-svg-icons';
 import React, { useEffect, useState } from 'react';
-import { Table, Card, Button, Spinner } from 'react-bootstrap';
+import { Table, Card, Button, Spinner, Container } from 'react-bootstrap';
+import PageHeader from '../../components/PageHeader';
+import { faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
 interface Workflow {
   id: number;
@@ -24,8 +27,11 @@ const WorkflowPage: React.FC = () => {
   }, []);
 
   return (
+
+            <Container className="py-4">
+      <PageHeader title="İş Akışları" icon={faProjectDiagram} />
     <Card className="shadow-sm">
-      <Card.Header className="bg-info text-white">
+      <Card.Header>
         <h5 className="mb-0">İş Akışları</h5>
       </Card.Header>
       <Card.Body>
@@ -62,6 +68,7 @@ const WorkflowPage: React.FC = () => {
         </Button>
       </Card.Body>
     </Card>
+    </Container>
   );
 };
 

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Card, Button, Spinner } from 'react-bootstrap';
+import { Table, Card, Button, Spinner, Container } from 'react-bootstrap';
+import PageHeader from '../../components/PageHeader';
+import { faTasks } from '@fortawesome/free-solid-svg-icons';
 
 interface Task {
   id: number;
@@ -24,8 +26,10 @@ const TaskPage: React.FC = () => {
   }, []);
 
   return (
+            <Container className="py-4">
+      <PageHeader title="Görevler" icon={faTasks} />
     <Card className="shadow-sm">
-      <Card.Header className="bg-info text-white">
+      <Card.Header>
         <h5 className="mb-0">Görevler</h5>
       </Card.Header>
       <Card.Body>
@@ -62,6 +66,7 @@ const TaskPage: React.FC = () => {
         </Button>
       </Card.Body>
     </Card>
+  </Container>
   );
 };
 

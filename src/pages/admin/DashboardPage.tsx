@@ -6,7 +6,8 @@ import {
   faTasks,
   faProjectDiagram,
   faChartLine,
-  faTachometerAlt
+  faTachometerAlt,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
 import PageHeader from '../../components/PageHeader';
 
@@ -62,9 +63,9 @@ const DashboardPage: React.FC = () => {
               <h5>Quick Actions</h5>
             </Card.Header>
             <Card.Body>
-              <button className="btn btn-primary mb-2 w-100">New Customer</button>
-              <button className="btn btn-success mb-2 w-100">Create Task</button>
-              <button className="btn btn-info w-100">Start Workflow</button>
+              <button className="btn btn-primary mb-2 w-100"><FontAwesomeIcon icon={faUser} className="me-2" />Yeni Müşteri</button>
+              <button className="btn btn-success mb-2 w-100"><FontAwesomeIcon icon={faTasks} className="me-2" />Yeni Görev</button>
+              <button className="btn btn-info w-100">+<FontAwesomeIcon icon={faProjectDiagram} className="me-2" />Yeni Akış</button>
             </Card.Body>
           </Card>
         </Col>

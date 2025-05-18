@@ -14,6 +14,7 @@ import CustomerPage from "./pages/admin/Customer";
 import StatisticsPage from "./pages/admin/Statistics";
 import TaskPage from "./pages/admin/Task";
 import WorkflowPage from "./pages/admin/Workflow";
+import SettingsPage from "./pages/Settings";
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute: React.FC = () => {
@@ -28,7 +29,7 @@ const AppContent: React.FC = () => {
   return (
     <>
       {showNavigation && <Navigation />}
-      <Container className="my-4">
+      <div>
         <Routes>
           {/* Admin Routes - Protected */}
           <Route path="/admin" element={<PrivateRoute />}>
@@ -40,6 +41,7 @@ const AppContent: React.FC = () => {
               <Route path="statistics" element={<StatisticsPage />} />
               <Route path="task" element={<TaskPage />} />
               <Route path="work-flow" element={<WorkflowPage />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Route>
 
@@ -51,7 +53,7 @@ const AppContent: React.FC = () => {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      </Container>
+      </div>
     </>
   );
 };

@@ -68,37 +68,37 @@ const Profile: React.FC = () => {
             </Card.Header>
             <Card.Body>
               <Row>
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Ad</Form.Label>
                     <Form.Control type="text" name="firstname" value={profile.firstname} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Soyad</Form.Label>
                     <Form.Control type="text" name="lastname" value={profile.lastname} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Telefon</Form.Label>
                     <Form.Control type="text" name="phone" value={profile.phone} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>E-posta</Form.Label>
                     <Form.Control type="email" name="email" value={profile.email} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                  <Col md={6}>
+                  <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Şirket Adı</Form.Label>
                     <Form.Control type="text" name="companyName" value={profile.companyName} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                                      <Col md={6}>
+                                      <Col md={4}>
                         <Form.Group className="mb-3">
                           <Form.Label>Sektör</Form.Label>
                           <Form.Select name="sector" value={profile.sector} onChange={handleChange}>
@@ -109,7 +109,7 @@ const Profile: React.FC = () => {
                           </Form.Select>
                         </Form.Group>
                       </Col>
-                <Col md={12}>
+                <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Adres</Form.Label>
                     <Form.Control
@@ -117,10 +117,14 @@ const Profile: React.FC = () => {
                       name="address"
                       value={profile.address}
                       onChange={handleChange}
-                      rows={3}
-                      placeholder="Adresinizi giriniz"
+                      rows={2}
                     />
                   </Form.Group>
+                </Col>
+                <Col md={6} className="d-flex justify-content-end align-items-end">
+                  <Button className='btn btn-success' onClick={handleProfileUpdate}>
+                  <FontAwesomeIcon icon={faSave} /> Bilgileri Güncelle
+                  </Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -159,11 +163,6 @@ const Profile: React.FC = () => {
           </Card>
         </Col>
       </Row>
-      <div>
-        <Button className='btn btn-success' onClick={handleProfileUpdate}>
-          <FontAwesomeIcon icon={faSave} className="me-2" /> Değişiklikleri Kaydet
-        </Button>
-      </div>
     </Container>
   );
 };
