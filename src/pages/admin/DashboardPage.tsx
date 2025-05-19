@@ -24,7 +24,7 @@ const DashboardPage: React.FC = () => {
       <div>
         <PageHeader title="Dashboard" icon={faTachometerAlt} />
       </div>
-      
+
       {/* Stats Cards */}
       <Row className="mb-4">
         {stats.map((stat, index) => (

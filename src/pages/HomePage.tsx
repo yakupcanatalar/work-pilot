@@ -1,9 +1,9 @@
 import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faChartLine, 
-  faUsers, 
+import {
+  faChartLine,
+  faUsers,
   faShieldAlt,
   faLightbulb
 } from '@fortawesome/free-solid-svg-icons';
@@ -44,20 +44,20 @@ const HomePage: React.FC = () => {
           </h1>
           <p className="lead mb-5 mx-auto" style={{ maxWidth: '700px' }}>
             WorkPilot, modern iş akışları için tasarlanmış hepsi bir arada platformumuzla takımların projeleri daha hızlı teslim etmesine yardımcı olur.
-          Hemen üye olun, işlerinizi zahmetsizce yönetmeye başlayın.
+            Hemen üye olun, işlerinizi zahmetsizce yönetmeye başlayın.
           </p>
           <div className="d-flex gap-3 justify-content-center">
-            <Button 
-              variant="primary" 
-              size="lg" 
+            <Button
+              variant="primary"
+              size="lg"
               className="px-4"
               href="/register"
             >
               Ücretsiz Başlayın
             </Button>
-            <Button 
-              variant="outline-primary" 
-              size="lg" 
+            <Button
+              variant="outline-primary"
+              size="lg"
               className="px-4"
               href="/about"
             >
@@ -76,10 +76,10 @@ const HomePage: React.FC = () => {
                 <Card className="h-100 border-0 shadow-sm">
                   <Card.Body className="text-center p-4">
                     <div className="mb-4">
-                      <FontAwesomeIcon 
-                        icon={feature.icon} 
-                        size="2x" 
-                        style={{ color: '#6f42c1' }} 
+                      <FontAwesomeIcon
+                        icon={feature.icon}
+                        size="2x"
+                        style={{ color: '#6f42c1' }}
                       />
                     </div>
                     <Card.Title className="fw-bold mb-3">{feature.title}</Card.Title>

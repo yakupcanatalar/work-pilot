@@ -92,23 +92,23 @@ const Profile: React.FC = () => {
                     <Form.Control type="email" name="email" value={profile.email} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                  <Col md={4}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Şirket Adı</Form.Label>
                     <Form.Control type="text" name="companyName" value={profile.companyName} onChange={handleChange} />
                   </Form.Group>
                 </Col>
-                                      <Col md={4}>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Sektör</Form.Label>
-                          <Form.Select name="sector" value={profile.sector} onChange={handleChange}>
-                            <option value="Yazılım">Yazılım</option>
-                            <option value="Finans">Finans</option>
-                            <option value="Sağlık">Sağlık</option>
-                            {/* Diğer sektörler */}
-                          </Form.Select>
-                        </Form.Group>
-                      </Col>
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Sektör</Form.Label>
+                    <Form.Select name="sector" value={profile.sector} onChange={handleChange}>
+                      <option value="Yazılım">Yazılım</option>
+                      <option value="Finans">Finans</option>
+                      <option value="Sağlık">Sağlık</option>
+                      {/* Diğer sektörler */}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Adres</Form.Label>
@@ -123,7 +123,7 @@ const Profile: React.FC = () => {
                 </Col>
                 <Col md={6} className="d-flex justify-content-end align-items-end">
                   <Button className='btn btn-success' onClick={handleProfileUpdate}>
-                  <FontAwesomeIcon icon={faSave} /> Bilgileri Güncelle
+                    <FontAwesomeIcon icon={faSave} /> Bilgileri Güncelle
                   </Button>
                 </Col>
               </Row>

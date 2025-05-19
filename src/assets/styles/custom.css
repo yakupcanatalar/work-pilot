@@ -145,3 +145,22 @@ footer a:hover {
     padding: 1rem;
   }
 }
+
+.react-flow__handle {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 2px solid #555;
+}
+
+.react-flow__handle:hover {
+  background: #666;
+}
+
+.cursor-grab {
+  cursor: grab;
+}
+
+.cursor-grab:active {
+  cursor: grabbing;
+}
