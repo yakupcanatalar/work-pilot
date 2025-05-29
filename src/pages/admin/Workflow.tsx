@@ -7,6 +7,8 @@ import { getTasks, createTask, updateTaskById, deleteTaskById } from '../../serv
 import { TaskStageDto } from '../../services/TaskStage';
 import FlowBuilder from './FlowBuilder';
 import Task from '../../services/Task';
+import '../../assets/styles/flow.css';
+
 
 const WorkflowPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -377,50 +379,76 @@ const WorkflowPage: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       <Modal show={showDelete} onHide={() => setShowDelete(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Silme Onayı</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Bu iş akışını silmek istediğinize emin misiniz?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDelete(false)}>
-            Vazgeç
-          </Button>
-          <Button variant="danger" onClick={confirmDelete} disabled={loading}>
-            {loading ? <Spinner size="sm" animation="border" /> : 'Sil'}
-          </Button>
-        </Modal.Footer>
+        <Card className="shadow-sm m-0">
+          <Card.Header>
+            <h5 className="mb-0">Silme Onayı</h5>
+          </Card.Header>
+          <Card.Body>
+            Bu iş akışını silmek istediğinize emin misiniz?
+          </Card.Body>
+          <Card.Footer className="d-flex justify-content-end gap-2">
+            <Button variant="secondary" onClick={() => setShowDelete(false)}>
+              Vazgeç
+            </Button>
+            <Button variant="danger" onClick={confirmDelete} disabled={loading}>
+              {loading ? <Spinner size="sm" animation="border" /> : 'Sil'}
+            </Button>
+          </Card.Footer>
+        </Card>
       </Modal>
 
       {/* Detail Modal */}
       <Modal show={showDetail} onHide={handleCloseDetail} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>İş Akışı Detayı</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {detailTask && (
-            <>
-              <h5>{detailTask.name}</h5>
-              <p><strong>Kullanıcı ID:</strong> {detailTask.userId}</p>
-              <p><strong>Not:</strong> {detailTask.note || '-'}</p>
-              <p><strong>Aşamalar:</strong></p>
-              {detailTask.stages && detailTask.stages.length > 0 ? (
-                <ul>
-                  {detailTask.stages.map(stage => (
-                    <li key={stage.id}>{stage.name}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted">Aşama bulunmamaktadır.</p>
-              )}
-              <p><strong>Akış Özeti:</strong> {getFlowSummary(detailTask)}</p>
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseDetail}>
-            Kapat
-          </Button>
-        </Modal.Footer>
+        <Card className="shadow-sm m-0">
+          <Card.Header>
+            <h5 className="mb-0">İş Akışı Detayı</h5>
+          </Card.Header>
+          <Card.Body>
+            {detailTask && (
+              <>
+                <h5 className="mb-3">{detailTask.name}</h5>
+                <table className="table table-bordered">
+                  <tbody>
+                    <tr>
+                      <th>Kullanıcı ID</th>
+                      <td>{detailTask.userId}</td>
+                    </tr>
+                    <tr>
+                      <th>Not</th>
+                      <td>{detailTask.note || '-'}</td>
+                    </tr>
+                    <tr>
+                      <th>Akış Özeti</th>
+                      <td>{getFlowSummary(detailTask)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <p><strong>Aşamalar:</strong></p>
+                {detailTask.stages && detailTask.stages.length > 0 ? (
+                  <div className="stage-flow">
+                    {detailTask.stages.map((stage, index) => (
+                      <React.Fragment key={stage.id}>
+                        <div className="stage-box">{stage.name}</div>
+                        {index !== detailTask.stages.length - 1 && (
+                          <div className="arrow">→</div>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted">Aşama bulunmamaktadır.</p>
+                )}
+              </>
+            )}
+          </Card.Body>
+
+          <Card.Footer className="d-flex justify-content-end">
+            <Button variant="secondary" onClick={handleCloseDetail}>
+              Kapat
+            </Button>
+          </Card.Footer>
+        </Card>
       </Modal>
     </Container>
   );
