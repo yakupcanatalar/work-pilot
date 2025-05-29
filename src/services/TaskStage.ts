@@ -1,5 +1,30 @@
 import axios from "axios";
 
+const API_URL = "http://localhost:8080/api/v1/";
+const TASK_STAGE_URL = `${API_URL}task-stage`;
+
+// Create an Axios instance
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+});
+
+// Add a request interceptor to include the Bearer token
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      if (!config.headers) {
+        config.headers = {};
+      }
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const TaskStageRequestValidator = {
   TASK_STAGE_NAME_MIN_LENGTH: 3,
   TASK_STAGE_NAME_MAX_LENGTH: 50,
@@ -23,34 +48,11 @@ export interface TaskStageUpdateDto {
   note?: string;
 }
 
-const API_URL = 'http://localhost:8080/api/v1/taskstage';
-
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-});
-
-// Add a request interceptor to include the Bearer token
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      if (!config.headers) {
-        config.headers = {};
-      }
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 // Get all stages
 export const getAllTaskStages = async (): Promise<TaskStageDto[]> => {
   try {
-    const response = await axiosInstance.get<TaskStageDto[]>("/");
-    return response.data;
+    const response = await axiosInstance.get(TASK_STAGE_URL);
+    return response.data as TaskStageDto[];
   } catch (error) {
     throw error;
   }
@@ -59,7 +61,7 @@ export const getAllTaskStages = async (): Promise<TaskStageDto[]> => {
 // Get stage by ID
 export const getTaskStageById = async (id: number): Promise<TaskStageDto> => {
   try {
-    const response = await axiosInstance.get<TaskStageDto>(`/${id}`);
+    const response = await axiosInstance.get(`${TASK_STAGE_URL}/${id}`);
     return response.data as TaskStageDto;
   } catch (error) {
     throw error;
@@ -69,7 +71,7 @@ export const getTaskStageById = async (id: number): Promise<TaskStageDto> => {
 // Create new stage
 export const createTaskStage = async (stage: TaskStageCreateDto): Promise<TaskStageDto> => {
   try {
-    const response = await axiosInstance.post("/", stage);
+    const response = await axiosInstance.post(TASK_STAGE_URL, stage);
     return response.data as TaskStageDto;
   } catch (error) {
     throw error;
@@ -79,7 +81,7 @@ export const createTaskStage = async (stage: TaskStageCreateDto): Promise<TaskSt
 // Update stage
 export const updateTaskStage = async (stage: TaskStageUpdateDto): Promise<TaskStageDto> => {
   try {
-    const response = await axiosInstance.put(`/${stage.id}`, stage);
+    const response = await axiosInstance.put(`${TASK_STAGE_URL}/${stage.id}`, stage);
     return response.data as TaskStageDto;
   } catch (error) {
     throw error;
@@ -89,13 +91,11 @@ export const updateTaskStage = async (stage: TaskStageUpdateDto): Promise<TaskSt
 // Delete stage
 export const deleteTaskStage = async (id: number): Promise<void> => {
   try {
-    await axiosInstance.delete(`/${id}`);
+    await axiosInstance.delete(`${TASK_STAGE_URL}/${id}`);
   } catch (error) {
     throw error;
   }
 };
-
-
 
 export default {
   getAllTaskStages,

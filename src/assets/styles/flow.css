@@ -1,0 +1,125 @@
+.modal-90w {
+  max-width: 90vw !important;
+  width: 90vw !important;
+}
+.modal-90w .modal-content {
+  height: 85vh;
+  max-height: 85vh;
+}
+@media (max-width: 900px) {
+  .modal-90w {
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+  .modal-90w .modal-content {
+    height: 98vh;
+    max-height: 98vh;
+  }
+}
+
+.input-sm {
+  font-size: 14px !important;
+  padding: 8px !important;
+}
+
+.flow-body {
+  min-height: 0 !important;
+  height: calc(85vh - 180px) !important;
+  overflow: hidden !important;
+}
+.flow-sidebar {
+  min-width: 300px !important;
+  max-width: 350px !important;
+  border-radius: 0 1rem 1rem 0 !important;
+}
+.flow-area {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+.flow-reactflow {
+  min-height: calc(85vh - 250px) !important;
+  height: 100% !important;
+}
+.stage-list-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.stage-rect {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 2px solid #212529;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(33,37,41,0.06);
+  min-width: 180px;
+  min-height: 44px;
+  padding: 0 8px 0 12px;
+  margin-bottom: 6px;
+  cursor: grab;
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+.stage-rect .stage-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #212529;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+.stage-rect .btn-close {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  font-size: 12px;
+  line-height: 1;
+  color: #212529;
+  opacity: 0.7;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.stage-rect .btn-close:hover {
+  opacity: 1;
+  background-color: #f8f9fa;
+  transform: scale(1.1);
+}
+.stage-rect .btn-close:before {
+  content: "×";
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn-sm {
+  font-size: 12px !important;
+  padding: 4px 12px !important;
+}
+.btn-footer {
+  min-width: 70px;
+}
+.minw-80 {
+  min-width: 80px !important;
+}
+.icon-tip {
+  font-size: 14px;
+}
+.info-text {
+  font-size: 12px;
+}
+.info-count {
+  font-size: 11px;
+}
+.info-note {
+  font-size: 11px;
+}

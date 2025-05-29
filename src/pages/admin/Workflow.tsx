@@ -1,23 +1,12 @@
 import { faProjectDiagram, faEdit, faTrash, faPlus, faInfoCircle, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
-import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner } from 'react-bootstrap';
+import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner, Modal, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
-import { getTasks } from '../../services/TaskService';
+import { getTasks, createTask, updateTaskById, deleteTaskById } from '../../services/TaskService';
+import { TaskStageDto } from '../../services/TaskStage';
 import FlowBuilder from './FlowBuilder';
-
-interface TaskStageDto {
-  id: number;
-  name: string;
-}
-
-interface Task {
-  id: number;
-  userId: number;
-  name: string;
-  note?: string;
-  stages: TaskStageDto[];
-}
+import Task from '../../services/Task';
 
 const WorkflowPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -25,32 +14,38 @@ const WorkflowPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [showFlowBuilder, setShowFlowBuilder] = useState(false); // Yeni ekledik
+  const [showFlowBuilder, setShowFlowBuilder] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [detailTask, setDetailTask] = useState<Task | null>(null);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
-  // Fetch tasks on mount
   useEffect(() => {
     fetchTasks();
   }, []);
 
   const fetchTasks = async () => {
     setLoading(true);
+    setError('');
     try {
       const data = await getTasks();
       setTasks(data);
     } catch (err) {
-      // handle error
+      console.error('Error fetching tasks:', err);
+      setError('İş akışları yüklenirken hata oluştu.');
     }
     setLoading(false);
   };
 
-  // Search filter
   const filteredTasks = tasks.filter(task =>
     (task.name && task.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (task.note && task.note.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (task.stages && task.stages.some(stage => stage.name.toLowerCase().includes(searchQuery.toLowerCase())))
   );
 
-  // Pagination
   const totalPages = Math.ceil(filteredTasks.length / pageSize);
   const paginatedTasks = filteredTasks.slice(
     (currentPage - 1) * pageSize,
@@ -58,132 +53,272 @@ const WorkflowPage: React.FC = () => {
   );
 
   const handlePageChange = (page: number) => setCurrentPage(page);
+
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPageSize(Number(e.target.value));
     setCurrentPage(1);
   };
 
-  // Yeni ekledik: FlowBuilder'dan gelen verileri işle
-  const handleSaveFlow = (flowData: { nodes: any[]; edges: any[] }) => {
-    // Burada akış verilerini kaydetme işlemini yapabilirsiniz
-    console.log('Flow data to save:', flowData);
-    
-    // Örnek olarak tasks listesine yeni bir task ekliyoruz
-    const newTask: Task = {
-      id: tasks.length + 1,
-      userId: 1, // Varsayılan kullanıcı ID
-      name: `Yeni Akış ${tasks.length + 1}`,
-      note: 'Yeni oluşturulan akış',
-      stages: flowData.nodes.map(node => ({
-        id: parseInt(node.id),
-        name: node.data.label
-      }))
-    };
-    
-    setTasks([...tasks, newTask]);
-    setShowFlowBuilder(false);
+  const handleShowAddModal = () => {
+    setEditingTask(null);
+    setShowFlowBuilder(true);
+  };
+
+  const handleShowEditModal = (task: Task) => {
+    setEditingTask(task);
+    setShowFlowBuilder(true);
+  };
+
+  const handleSaveFlow = async (flowData: {
+    name: string;
+    note: string;
+    stages: TaskStageDto[];
+  }) => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const taskData = {
+        name: flowData.name,
+        note: flowData.note,
+        stageIds: flowData.stages.map(stage => stage.id!).filter(id => id !== undefined)
+      };
+
+      if (editingTask) {
+        await updateTaskById(editingTask.id, taskData);
+        setSuccess('İş akışı başarıyla güncellendi!');
+      } else {
+        await createTask(taskData);
+        setSuccess('İş akışı başarıyla oluşturuldu!');
+      }
+
+      await fetchTasks();
+      setShowFlowBuilder(false);
+      setEditingTask(null);
+
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      console.error('Error saving flow:', error);
+      setError('İş akışı kaydedilirken hata oluştu!');
+    }
+    setLoading(false);
+  };
+
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+    setShowDelete(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId !== null) {
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      try {
+        await deleteTaskById(deleteId);
+        await fetchTasks();
+        setSuccess('İş akışı başarıyla silindi!');
+        setTimeout(() => setSuccess(''), 3000);
+      } catch (err) {
+        console.error('Error deleting task:', err);
+        setError('İş akışı silinirken hata oluştu!');
+      }
+      setShowDelete(false);
+      setDeleteId(null);
+      setLoading(false);
+    }
+  };
+
+  const handleShowDetail = (task: Task) => {
+    setDetailTask(task);
+    setShowDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setShowDetail(false);
+    setDetailTask(null);
+  };
+
+  const getFlowSummary = (task: Task) => {
+    const stageCount = task.stages?.length || 0;
+    return `${stageCount} aşama`;
+  };
+
+  const handleRefresh = () => {
+    setSearchQuery('');
+    setCurrentPage(1);
+    fetchTasks();
   };
 
   return (
     <Container className="py-4">
-      <PageHeader title="Görevler" icon={faProjectDiagram} />
+      <PageHeader title="İş Akışları" icon={faProjectDiagram} />
+
+      {/* Alert Messages */}
+      {error && (
+        <Alert variant="danger" dismissible onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert variant="success" dismissible onClose={() => setSuccess('')}>
+          {success}
+        </Alert>
+      )}
+
       <Row>
         <Col md={12}>
           <Row className="mb-3">
-            <Col md={10}>
+            <Col md={8}>
               <InputGroup>
                 <Form.Control
                   type="text"
-                  placeholder="Ara..."
+                  placeholder="İş akışı adı, not veya aşama adına göre ara..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className="bg-light"
                 />
-                <Button variant="outline-secondary" onClick={fetchTasks}>
-                  Ara
+                <Button variant="outline-secondary" onClick={handleRefresh} disabled={loading}>
+                  {loading ? <Spinner size="sm" animation="border" /> : 'Yenile'}
                 </Button>
               </InputGroup>
             </Col>
-            <Col md={2} className="d-flex justify-content-end">
+            <Col md={4} className="d-flex justify-content-end gap-2">
+              <Button
+                variant="outline-primary"
+                onClick={handleRefresh}
+                disabled={loading}
+                title="Listeyi yenile"
+              >
+                <FontAwesomeIcon icon={faProjectDiagram} />
+              </Button>
               <Button
                 variant="primary"
                 className="d-flex align-items-center"
-                onClick={() => setShowFlowBuilder(true)}
+                onClick={handleShowAddModal}
+                disabled={loading}
               >
                 <FontAwesomeIcon icon={faPlus} className="me-2" />
-                Yeni İş Akışı Ekle
+                Yeni İş Akışı
               </Button>
             </Col>
           </Row>
         </Col>
+
         <Col md={12}>
           <Card className="mb-2">
-            <Card.Header>
-              <h5 className="mb-0">Görev Listesi</h5>
+            <Card.Header className="d-flex justify-content-between align-items-center">
+              <h5 className="mb-0">İş Akışı Listesi</h5>
+              <small className="text-muted">
+                Toplam: {filteredTasks.length} kayıt
+              </small>
             </Card.Header>
           </Card>
+
           <Row>
             <Col md={12}>
               <div className="table-responsive">
-                <Table
-                  hover
-                  bordered
-                  className="align-middle table-striped shadow-sm rounded"
-                  style={{ background: "#fff", borderRadius: "0.5rem", overflow: "hidden" }}
-                >
+                <Table hover bordered className="align-middle table-striped shadow-sm rounded">
                   <thead className="table-light">
                     <tr>
-                      <th>Sıra</th>
-                      <th>Adı</th>
-                      <th>Kullanıcı ID</th>
-                      <th>Not</th>
+                      <th style={{ width: '60px' }}>Sıra</th>
+                      <th>İş Akışı Adı</th>
+                      <th style={{ width: '120px' }}>Kullanıcı ID</th>
+                      <th>Akış Özeti</th>
                       <th>Aşamalar</th>
-                      <th style={{ width: 140 }}>İşlemler</th>
+                      <th style={{ width: '140px' }}>İşlemler</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       <tr>
                         <td colSpan={6} className="text-center py-4">
-                          <Spinner animation="border" size="sm" /> Yükleniyor...
+                          <Spinner animation="border" size="sm" className="me-2" />
+                          Yükleniyor...
                         </td>
                       </tr>
                     ) : filteredTasks.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="text-center text-muted py-4">
-                          Kayıt bulunamadı.
+                          {searchQuery ? 'Arama kriterlerine uygun kayıt bulunamadı.' : 'Henüz iş akışı oluşturulmamış.'}
                         </td>
                       </tr>
                     ) : (
                       paginatedTasks.map((task, index) => (
                         <tr key={task.id}>
-                          <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                          <td>
-                            <span>{task.name}</span>
-                            <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" />
-                          </td>
-                          <td>{task.userId}</td>
-                          <td>{typeof task.note === 'string' ? task.note : '-'}</td>
-                          <td>
-                            {task.stages && task.stages.length > 0
-                              ? task.stages.map(stage => stage.name).join(', ')
-                              : '-'}
+                          <td className="text-center">
+                            {(currentPage - 1) * pageSize + index + 1}
                           </td>
                           <td>
-                            <div className="d-flex gap-2">
+                            <div
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleShowDetail(task)}
+                              className="d-flex align-items-center"
+                            >
+                              <span className="fw-semibold text-primary">{task.name}</span>
+                              <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" size="sm" />
+                            </div>
+                            {task.note && (
+                              <small className="text-muted d-block mt-1">
+                                {task.note.length > 50
+                                  ? `${task.note.substring(0, 50)}...`
+                                  : task.note}
+                              </small>
+                            )}
+                          </td>
+                          <td className="text-center">
+                            <span className="badge bg-secondary">{task.userId}</span>
+                          </td>
+                          <td>
+                            <small className="text-muted">{getFlowSummary(task)}</small>
+                          </td>
+                          <td>
+                            {task.stages && task.stages.length > 0 ? (
+                              <div className="d-flex flex-wrap gap-1">
+                                {task.stages.slice(0, 3).map(stage => (
+                                  <span key={stage.id} className="badge bg-light text-dark border">
+                                    {stage.name}
+                                  </span>
+                                ))}
+                                {task.stages.length > 3 && (
+                                  <span className="badge bg-secondary">
+                                    +{task.stages.length - 3} daha
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted">-</span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="d-flex gap-1 justify-content-center">
                               <Button
-                                variant="warning"
+                                variant="outline-info"
                                 size="sm"
-                                title="Güncelle"
-                                style={{ borderRadius: 20, minWidth: 36 }}
+                                onClick={() => handleShowDetail(task)}
+                                title="Detay"
+                                style={{ borderRadius: '20px', minWidth: '36px' }}
+                              >
+                                <FontAwesomeIcon icon={faInfoCircle} />
+                              </Button>
+                              <Button
+                                variant="outline-warning"
+                                size="sm"
+                                onClick={() => handleShowEditModal(task)}
+                                title="Düzenle"
+                                style={{ borderRadius: '20px', minWidth: '36px' }}
+                                disabled={loading}
                               >
                                 <FontAwesomeIcon icon={faEdit} />
                               </Button>
                               <Button
-                                variant="danger"
+                                variant="outline-danger"
                                 size="sm"
+                                onClick={() => handleDelete(task.id)}
                                 title="Sil"
-                                style={{ borderRadius: 20, minWidth: 36 }}
+                                style={{ borderRadius: '20px', minWidth: '36px' }}
+                                disabled={loading}
                               >
                                 <FontAwesomeIcon icon={faTrash} />
                               </Button>
@@ -194,60 +329,110 @@ const WorkflowPage: React.FC = () => {
                     )}
                   </tbody>
                 </Table>
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 mt-3 px-2 py-2 bg-light rounded shadow-sm border">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="fw-semibold">Sayfa boyutu:</span>
-                    <Form.Select
-                      size="sm"
-                      value={pageSize}
-                      onChange={handlePageSizeChange}
-                      style={{ width: 90, minWidth: 70 }}
-                      className="shadow-none"
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                      <option value={50}>50</option>
-                    </Form.Select>
-                  </div>
-                  <div className="d-flex align-items-center gap-2">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      disabled={currentPage === 1}
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className="rounded-circle px-2"
-                      title="Önceki Sayfa"
-                    >
-                      <FontAwesomeIcon icon={faChevronLeft} />
-                    </Button>
-                    <span className="fw-semibold" style={{ minWidth: 60, textAlign: 'center' }}>
-                      {currentPage} / {totalPages || 1}
-                    </span>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      disabled={currentPage === totalPages || totalPages === 0}
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className="rounded-circle px-2"
-                      title="Sonraki Sayfa"
-                    >
-                      <FontAwesomeIcon icon={faChevronRight} />
-                    </Button>
-                  </div>
-                </div>
               </div>
             </Col>
           </Row>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <Row className="mt-3">
+              <Col className="d-flex justify-content-between align-items-center">
+                <div>
+                  <Form.Select
+                    size="sm"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                    style={{ width: 'auto', display: 'inline-block' }}
+                  >
+                    {[5, 10, 20, 50].map(size => (
+                      <option key={size} value={size}>
+                        {size} kayıt
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+                <div className="d-flex align-items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-secondary"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </Button>
+                  <span>
+                    {currentPage} / {totalPages}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline-secondary"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+          )}
         </Col>
       </Row>
-      
-      {/* FlowBuilder Modal'ını ekledik */}
-      <FlowBuilder 
-        show={showFlowBuilder} 
-        handleClose={() => setShowFlowBuilder(false)} 
+
+      {/* Flow Builder Modal */}
+      <FlowBuilder
+        show={showFlowBuilder}
+        onHide={() => setShowFlowBuilder(false)}
         onSave={handleSaveFlow}
+        task={editingTask}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDelete} onHide={() => setShowDelete(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Silme Onayı</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Bu iş akışını silmek istediğinize emin misiniz?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDelete(false)}>
+            Vazgeç
+          </Button>
+          <Button variant="danger" onClick={confirmDelete} disabled={loading}>
+            {loading ? <Spinner size="sm" animation="border" /> : 'Sil'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Detail Modal */}
+      <Modal show={showDetail} onHide={handleCloseDetail} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>İş Akışı Detayı</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {detailTask && (
+            <>
+              <h5>{detailTask.name}</h5>
+              <p><strong>Kullanıcı ID:</strong> {detailTask.userId}</p>
+              <p><strong>Not:</strong> {detailTask.note || '-'}</p>
+              <p><strong>Aşamalar:</strong></p>
+              {detailTask.stages && detailTask.stages.length > 0 ? (
+                <ul>
+                  {detailTask.stages.map(stage => (
+                    <li key={stage.id}>{stage.name}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted">Aşama bulunmamaktadır.</p>
+              )}
+              <p><strong>Akış Özeti:</strong> {getFlowSummary(detailTask)}</p>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDetail}>
+            Kapat
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

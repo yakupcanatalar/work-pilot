@@ -6,7 +6,6 @@ import PageHeader from '../../components/PageHeader';
 import CustomerService from '../../services/CustomerService';
 import CustomerDTO from '../../services/CustomerDTO';
 
-// Define an empty customer object matching CustomerDTO structure
 const emptyCustomer: CustomerDTO = {
   id: 0,
   name: '',
@@ -32,7 +31,6 @@ const CustomerPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Fetch customers on mount
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -48,14 +46,12 @@ const CustomerPage: React.FC = () => {
     setLoading(false);
   };
 
-  // Sadece ekleme için modal aç
   const handleShowAddModal = () => {
     setModalCustomer(emptyCustomer);
     setIsEdit(false);
     setShowModal(true);
   };
 
-  // Arama için filtreleme (isteğe bağlı: backend search ile değiştirilebilir)
   const filteredCustomers = customers.filter(customer =>
     (customer.name && customer.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (customer.phoneNumber && customer.phoneNumber.includes(searchQuery)) ||
@@ -64,7 +60,6 @@ const CustomerPage: React.FC = () => {
     (customer.note && customer.note.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // Sadece güncelleme için modal aç
   const handleShowEditModal = (customer: CustomerDTO) => {
     setModalCustomer(customer);
     setIsEdit(true);
@@ -125,7 +120,6 @@ const CustomerPage: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
-  // Detay modalı
   const handleShowDetail = (customer: CustomerDTO) => {
     setDetailCustomer(customer);
     setShowDetail(true);
@@ -136,7 +130,6 @@ const CustomerPage: React.FC = () => {
     setDetailCustomer(null);
   };
 
-  // Pagination
   const totalPages = Math.ceil(filteredCustomers.length / pageSize);
 
   const paginatedCustomers = filteredCustomers.slice(
@@ -159,25 +152,26 @@ const CustomerPage: React.FC = () => {
       <Row>
         <Col md={12}>
           <Row className="mb-3">
-            <Col md={10}>
+            <Col md={8}>
               <InputGroup>
                 <Form.Control
                   type="text"
-                  placeholder="Ara..."
+                  placeholder="Ad, telefon, e-posta, adres veya nota göre ara..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="bg-light"
+                  // className="bg-light"
                 />
-                <Button variant="outline-secondary" onClick={fetchCustomers}>
-                  Ara
+                <Button variant="outline-secondary" onClick={fetchCustomers} disabled={loading}>
+                  {loading ? <Spinner size="sm" animation="border" /> : 'Yenile'}
                 </Button>
               </InputGroup>
             </Col>
-            <Col md={2} className="d-flex justify-content-end">
+            <Col md={4} className="d-flex justify-content-end gap-2">
               <Button
                 variant="success"
                 onClick={handleShowAddModal}
-                className="d-flex align-items-center"
+                // className="d-flex align-items-center"
+                disabled={loading}
               >
                 <FontAwesomeIcon icon={faUser} className="me-2" />
                 + Ekle
@@ -188,8 +182,11 @@ const CustomerPage: React.FC = () => {
 
         <Col md={12}>
           <Card className="mb-2">
-            <Card.Header>
+            <Card.Header className="d-flex justify-content-between align-items-center">
               <h5 className="mb-0">Müşteri Listesi</h5>
+              <small className="text-muted">
+                Toplam: {filteredCustomers.length} kayıt
+              </small>
             </Card.Header>
           </Card>
           <Row>
@@ -199,7 +196,6 @@ const CustomerPage: React.FC = () => {
                   hover
                   bordered
                   className="align-middle table-striped shadow-sm rounded"
-                  style={{ background: "#fff", borderRadius: "0.5rem", overflow: "hidden" }}
                 >
                   <thead className="table-light">
                     <tr>
@@ -209,7 +205,7 @@ const CustomerPage: React.FC = () => {
                       <th>E-posta</th>
                       <th>Adres</th>
                       <th>Not</th>
-                      <th style={{ width: 140 }}>İşlemler</th>
+                      <th>İşlemler</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -222,43 +218,62 @@ const CustomerPage: React.FC = () => {
                     ) : filteredCustomers.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="text-center text-muted py-4">
-                          Kayıt bulunamadı.
+                          {searchQuery ? 'Arama kriterlerine uygun kayıt bulunamadı.' : 'Henüz müşteri eklenmemiş.'}
                         </td>
                       </tr>
                     ) : (
                       paginatedCustomers.map((customer, index) => (
                         <tr key={customer.id}>
-                          <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                          <td
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => handleShowDetail(customer)}
-                          >
-                            <span>
-                              {customer.name}
-                            </span>
-                            <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" />
+                          <td className="text-center">
+                            {(currentPage - 1) * pageSize + index + 1}
                           </td>
-                          <td>{customer.phoneNumber}</td>
-                          <td>{customer.email}</td>
-                          <td>{customer.address}</td>
-                          <td>{customer.note}</td>
                           <td>
-                            <div className="d-flex gap-2">
+                            <div
+                              // className="d-flex align-items-center customer-detail-link"
+                              style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                              onClick={() => handleShowDetail(customer)}
+                            >
+                              <span className="fw-semibold text-primary">{customer.name}</span>
+                              <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" size="sm" />
+                            </div>
+                          </td>
+                          <td>
+                            <span className="text-muted">{customer.phoneNumber}</span>
+                          </td>
+                          <td>
+                            <span className="text-muted">{customer.email}</span>
+                          </td>
+                          <td>
+                            <span className="text-muted">{customer.address}</span>
+                          </td>
+                          <td>
+                            <span className="text-muted">{customer.note}</span>
+                          </td>
+                          <td>
+                            <div className="d-flex gap-1 justify-content-center">
                               <Button
-                                variant="warning"
+                                variant="outline-info"
+                                size="sm"
+                                onClick={() => handleShowDetail(customer)}
+                                title="Detay"
+                              >
+                                <FontAwesomeIcon icon={faInfoCircle} />
+                              </Button>
+                              <Button
+                                variant="outline-warning"
                                 size="sm"
                                 onClick={() => handleShowEditModal(customer)}
-                                title="Güncelle"
-                                style={{ borderRadius: 20, minWidth: 36 }}
+                                title="Düzenle"
+                                disabled={loading}
                               >
                                 <FontAwesomeIcon icon={faEdit} />
                               </Button>
                               <Button
-                                variant="danger"
+                                variant="outline-danger"
                                 size="sm"
                                 onClick={() => customer.id !== undefined && handleDelete(customer.id)}
                                 title="Sil"
-                                style={{ borderRadius: 20, minWidth: 36 }}
+                                disabled={loading}
                               >
                                 <FontAwesomeIcon icon={faTrash} />
                               </Button>
@@ -269,51 +284,50 @@ const CustomerPage: React.FC = () => {
                     )}
                   </tbody>
                 </Table>
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 mt-3 px-2 py-2 bg-light rounded shadow-sm border">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="fw-semibold">Sayfa boyutu:</span>
-                    <Form.Select
-                      size="sm"
-                      value={pageSize}
-                      onChange={handlePageSizeChange}
-                      style={{ width: 90, minWidth: 70 }}
-                      className="shadow-none"
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                      <option value={50}>50</option>
-                    </Form.Select>
-                  </div>
-                  <div className="d-flex align-items-center gap-2">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      disabled={currentPage === 1}
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className="rounded-circle px-2"
-                      title="Önceki Sayfa"
-                    >
-                      <FontAwesomeIcon icon={faChevronLeft} />
-                    </Button>
-                    <span className="fw-semibold" style={{ minWidth: 60, textAlign: 'center' }}>
-                      {currentPage} / {totalPages || 1}
-                    </span>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      disabled={currentPage === totalPages || totalPages === 0}
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className="rounded-circle px-2"
-                      title="Sonraki Sayfa"
-                    >
-                      <FontAwesomeIcon icon={faChevronRight} />
-                    </Button>
-                  </div>
-                </div>
               </div>
             </Col>
           </Row>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <Row className="mt-3">
+              <Col className="d-flex justify-content-between align-items-center">
+                <div>
+                  <Form.Select
+                    size="sm"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                  >
+                    {[5, 10, 20, 50].map(size => (
+                      <option key={size} value={size}>
+                        {size} kayıt
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+                <div className="d-flex align-items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-secondary"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </Button>
+                  <span>
+                    {currentPage} / {totalPages}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline-secondary"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+          )}
         </Col>
       </Row>
 
@@ -361,7 +375,6 @@ const CustomerPage: React.FC = () => {
                   value={modalCustomer.address}
                   onChange={handleModalChange}
                   rows={4}
-                  style={{ minHeight: 80, fontSize: 16 }}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
