@@ -47,7 +47,7 @@ const SettingsPage: React.FC = () => {
                     onChange={e => setTheme(e.target.value)}
                   >
                     <option value="light">Açık</option>
-                    <option value="dark">Koyu</option>
+                    <option disabled value="dark">Koyu</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -59,7 +59,7 @@ const SettingsPage: React.FC = () => {
                     onChange={e => setLanguage(e.target.value)}
                   >
                     <option value="tr">Türkçe</option>
-                    <option value="en">English</option>
+                    <option disabled value="en">English</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -71,12 +71,14 @@ const SettingsPage: React.FC = () => {
                       type="checkbox"
                       label="SMS"
                       name="sms"
+                      disabled
                       checked={notifications.sms}
                       onChange={handleNotificationChange}
                     />
                     <Form.Check
                       type="checkbox"
                       label="Mail"
+                      disabled
                       name="mail"
                       checked={notifications.mail}
                       onChange={handleNotificationChange}
@@ -85,6 +87,7 @@ const SettingsPage: React.FC = () => {
                       type="checkbox"
                       label="Whatsapp"
                       name="whatsapp"
+                      disabled
                       checked={notifications.whatsapp}
                       onChange={handleNotificationChange}
                     />
@@ -97,6 +100,9 @@ const SettingsPage: React.FC = () => {
                 <FontAwesomeIcon icon={faSave} className="me-2" />
                 Kaydet
               </Button>
+            </div>
+            <div className="mt-4 text-muted" style={{ fontSize: 14 }}>
+              <strong>Not:</strong> Yeni sürümlerde koyu tema, Bildirim seçenekleri ve dil seçenekleri eklenecektir .
             </div>
           </Form>
         </Card.Body>

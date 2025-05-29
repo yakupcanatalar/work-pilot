@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Form, Button, Card, Alert, Container } from 'react-bootstrap';
+import { Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/UserService'; // Güncel servis yolu
+import { loginUser } from '../services/UserService';
+import '../assets/styles/login.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFish } from '@fortawesome/free-solid-svg-icons';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +30,7 @@ const LoginPage: React.FC = () => {
       const response = await loginUser(formData);
       localStorage.setItem('accessToken', response.access_token);
       localStorage.setItem('refreshToken', response.refresh_token);
-      navigate('/admin'); // Başarılı girişte admin sayfasına yönlendir
+      navigate('/admin');
     } catch (err: any) {
       const message = err.response?.data?.message || 'Giriş sırasında bir hata oluştu';
       setError(message);
@@ -36,33 +39,68 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    alert('Şifre sıfırlama bağlantısı e-posta adresinize gönderilecek! 🐟');
+  };
+
   return (
-    <Container className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '80vh' }}>
-      <Card className="w-100" style={{ maxWidth: '400px' }}>
+    <div className="login-bg">
+      <Card className="login-card">
         <Card.Body>
-          <h4 className="text-center mb-4">Giriş Yap</h4>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} required />
+              <Form.Label className="login-label">Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="login-input"
+                placeholder="E-posta adresinizi girin"
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Şifre</Form.Label>
-              <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} required />
+              <Form.Label className="login-label">Şifre</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="login-input"
+                placeholder="Şifrenizi girin"
+              />
             </Form.Group>
 
-            <Button disabled={loading} className="w-100" type="submit">
+            <Button
+              disabled={loading}
+              className="w-100 login-btn"
+              type="submit"
+            >
               {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
             </Button>
           </Form>
-          <div className="text-center mt-3">
-            Hesabınız yok mu? <Link to="/register">Kayıt Ol</Link>
+          <div className="login-register-text">
+            Hesabınız yok mu?{' '}
+            <Link to="/register" className="login-register-link">
+              Kayıt Ol
+            </Link>
+            <Button
+              variant="link"
+              className="w-100 mt-2 d-flex align-items-center justify-content-center"
+              type="button"
+              onClick={handleForgotPassword}
+            >
+              <FontAwesomeIcon icon={faFish} className="me-2" />
+              Şifremi Unuttum
+            </Button>
           </div>
         </Card.Body>
       </Card>
-    </Container>
+    </div>
   );
 };
 
