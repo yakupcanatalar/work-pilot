@@ -224,7 +224,7 @@ const WorkflowPage: React.FC = () => {
                     <tr>
                       <th style={{ width: '60px' }}>Sıra</th>
                       <th>İş Akışı Adı</th>
-                      <th style={{ width: '120px' }}>Kullanıcı ID</th>
+                      <th>Notlar</th>
                       <th>Akış Özeti</th>
                       <th>Aşamalar</th>
                       <th style={{ width: '140px' }}>İşlemler</th>
@@ -251,31 +251,23 @@ const WorkflowPage: React.FC = () => {
                             {(currentPage - 1) * pageSize + index + 1}
                           </td>
                           <td>
-                            <div
-                              style={{ cursor: 'pointer' }}
+                            <span
+                              style={{ color: '#0d6efd', fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
                               onClick={() => handleShowDetail(task)}
-                              className="d-flex align-items-center"
                             >
-                              <span className="fw-semibold text-primary">{task.name}</span>
+                              {task.name}
                               <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" size="sm" />
-                            </div>
-                            {task.note && (
-                              <small className="text-muted d-block mt-1">
-                                {task.note.length > 50
-                                  ? `${task.note.substring(0, 50)}...`
-                                  : task.note}
-                              </small>
-                            )}
+                            </span>
                           </td>
                           <td className="text-center">
-                            <span className="badge bg-secondary">{task.userId}</span>
+                            <small className="text-muted">{task.note}</small>
                           </td>
                           <td>
                             <small className="text-muted">{getFlowSummary(task)}</small>
                           </td>
                           <td>
                             {task.stages && task.stages.length > 0 ? (
-                              <div className="d-flex flex-wrap gap-1">
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                                 {task.stages.slice(0, 3).map(stage => (
                                   <span key={stage.id} className="badge bg-light text-dark border">
                                     {stage.name}
@@ -292,13 +284,12 @@ const WorkflowPage: React.FC = () => {
                             )}
                           </td>
                           <td>
-                            <div className="d-flex gap-1 justify-content-center">
+                            <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
                               <Button
                                 variant="outline-info"
                                 size="sm"
                                 onClick={() => handleShowDetail(task)}
                                 title="Detay"
-                                style={{ borderRadius: '20px', minWidth: '36px' }}
                               >
                                 <FontAwesomeIcon icon={faInfoCircle} />
                               </Button>
@@ -307,7 +298,6 @@ const WorkflowPage: React.FC = () => {
                                 size="sm"
                                 onClick={() => handleShowEditModal(task)}
                                 title="Düzenle"
-                                style={{ borderRadius: '20px', minWidth: '36px' }}
                                 disabled={loading}
                               >
                                 <FontAwesomeIcon icon={faEdit} />
@@ -317,7 +307,6 @@ const WorkflowPage: React.FC = () => {
                                 size="sm"
                                 onClick={() => handleDelete(task.id)}
                                 title="Sil"
-                                style={{ borderRadius: '20px', minWidth: '36px' }}
                                 disabled={loading}
                               >
                                 <FontAwesomeIcon icon={faTrash} />

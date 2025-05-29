@@ -13,27 +13,33 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { getAllTaskStages, createTaskStage, deleteTaskStage, TaskStageDto } from '../../services/TaskStage';
 import '../../assets/styles/flow.css';
-
-interface Task {
-  id?: number;
-  name: string;
-  note?: string;
-  stages?: TaskStageDto[];
-  nodes?: Node[];
-  edges?: Edge[];
-}
+import Task from '../../services/Task';
 
 interface FlowBuilderProps {
   show: boolean;
   onHide: () => void;
-  onSave: (flowData: {
-    name: string;
-    note: string;
-    stages: TaskStageDto[];
-    nodes: Node[];
-    edges: Edge[];
-  }) => Promise<void>;
+  onSave: (flowData: { name: string; note: string; stages: TaskStageDto[] }) => Promise<void>;
   task?: Task | null;
+}
+
+function getOrderedStageIds(nodes: Node[], edges: Edge[]): number[] {
+  if (nodes.length === 0) return [];
+  const sourceIds = edges.map(e => e.source);
+  const targetIds = edges.map(e => e.target);
+
+  // Başlangıç node'unu bul (source olup target olmayan)
+  let startNode = nodes.find(n => !targetIds.includes(n.id));
+  if (!startNode) startNode = nodes[0];
+
+  const order: number[] = [];
+  let current: Node | undefined = startNode;
+  while (current) {
+    order.push(current.data.stageId);
+    const nextEdge: Edge | undefined = edges.find(e => e.source === current?.id);
+    if (!nextEdge) break;
+    current = nodes.find(n => n.id === nextEdge.target);
+  }
+  return order;
 }
 
 const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task }) => {
@@ -41,11 +47,10 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
   const [note, setNote] = useState('');
   const [newStageName, setNewStageName] = useState('');
   const [availableStages, setAvailableStages] = useState<TaskStageDto[]>([]);
-  const [selectedStages, setSelectedStages] = useState<TaskStageDto[]>([]);
+  const [selectedStageIds, setSelectedStageIds] = useState<number[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
-  const [lastNodeId, setLastNodeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [newStageNote, setNewStageNote] = useState('');
 
@@ -59,6 +64,21 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
     }
   };
 
+  // Create edges based on node order
+  const createSequentialEdges = (nodeList: Node[]): Edge[] => {
+    const edgeList: Edge[] = [];
+    for (let i = 0; i < nodeList.length - 1; i++) {
+      edgeList.push({
+        id: `edge-${nodeList[i].id}-${nodeList[i + 1].id}`,
+        source: nodeList[i].id,
+        target: nodeList[i + 1].id,
+        markerEnd: { type: MarkerType.ArrowClosed },
+        animated: true,
+      });
+    }
+    return edgeList;
+  };
+
   // Initialize data
   useEffect(() => {
     if (show) {
@@ -67,19 +87,36 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
       if (task) {
         setName(task.name || '');
         setNote(task.note || '');
-        setSelectedStages(task.stages || []);
-        setNodes(task.nodes || []);
-        setEdges(task.edges || []);
-        if (task.nodes && task.nodes.length > 0) {
-          setLastNodeId(task.nodes[task.nodes.length - 1].id);
+
+        const stageIds = task.stages?.map(stage => stage.id) || [];
+        setSelectedStageIds(stageIds);
+
+        if (task.stages && task.stages.length > 0) {
+          const taskNodes: Node[] = task.stages.map((stage, index) => ({
+            id: `node-${stage.id}`,
+            type: 'default',
+            position: {
+              x: 200 + (index * 200),
+              y: 100,
+            },
+            data: {
+              label: stage.name,
+              stageId: stage.id
+            },
+          }));
+
+          setNodes(taskNodes);
+          setEdges(createSequentialEdges(taskNodes));
+        } else {
+          setNodes([]);
+          setEdges([]);
         }
       } else {
         setName('');
         setNote('');
-        setSelectedStages([]);
+        setSelectedStageIds([]);
         setNodes([]);
         setEdges([]);
-        setLastNodeId(null);
       }
     }
     // eslint-disable-next-line
@@ -112,51 +149,47 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
 
       if (!reactFlowInstance) return;
 
-      const stageName = event.dataTransfer.getData('application/reactflow');
-      if (!stageName) return;
+      const stageData = event.dataTransfer.getData('application/reactflow');
+      if (!stageData) return;
+
+      const { stageName, stageId } = JSON.parse(stageData);
 
       const basePosition = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
 
-      const offset = 80;
-      const newNodeId = `node-${Date.now()}`;
-      const newNode = {
+      const newNodeId = `node-${stageId}`;
+
+      // Check if stage is already added
+      const existingNode = nodes.find(node => node.data.stageId === stageId);
+      if (existingNode) {
+        alert('Bu aşama zaten eklenmiş!');
+        return;
+      }
+
+      const newNode: Node = {
         id: newNodeId,
         type: 'default',
         position: {
-          x: basePosition.x + offset,
-          y: basePosition.y + offset,
+          x: basePosition.x,
+          y: basePosition.y,
         },
-        data: { label: stageName },
+        data: {
+          label: stageName,
+          stageId: stageId
+        },
       };
 
       setNodes((nds) => {
-        const updatedNodes = nds.concat(newNode);
-
-        // Auto-connect to last node if exists
-        if (lastNodeId && updatedNodes.length > 1) {
-          setEdges((eds) =>
-            addEdge(
-              {
-                id: `edge-${lastNodeId}-${newNodeId}`,
-                source: lastNodeId,
-                target: newNodeId,
-                markerEnd: { type: MarkerType.ArrowClosed },
-                animated: true,
-              },
-              eds
-            )
-          );
-        }
-
+        const updatedNodes = [...nds, newNode];
+        setEdges(createSequentialEdges(updatedNodes));
         return updatedNodes;
       });
 
-      setLastNodeId(newNodeId);
+      setSelectedStageIds(prev => [...prev, stageId]);
     },
-    [reactFlowInstance, setNodes, lastNodeId, setEdges]
+    [reactFlowInstance, nodes, setNodes, setEdges]
   );
 
   const onNodeContextMenu = useCallback(
@@ -164,21 +197,21 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
       event.preventDefault();
 
       if (window.confirm('Bu aşamayı silmek istediğinize emin misiniz?')) {
-        setNodes((nds) => nds.filter((n) => n.id !== node.id));
-        setEdges((eds) =>
-          eds.filter((edge) => edge.source !== node.id && edge.target !== node.id)
-        );
+        const stageId = node.data.stageId;
 
-        // Update lastNodeId if we deleted the last node
-        if (lastNodeId === node.id) {
-          setLastNodeId(nodes.length > 1 ? nodes[nodes.length - 2].id : null);
-        }
+        setNodes((nds) => {
+          const filteredNodes = nds.filter((n) => n.id !== node.id);
+          setEdges(createSequentialEdges(filteredNodes));
+          return filteredNodes;
+        });
+
+        setSelectedStageIds(prev => prev.filter(id => id !== stageId));
       }
     },
-    [setNodes, setEdges, lastNodeId, nodes]
+    [setNodes, setEdges]
   );
 
-  // Yeni aşama ekle ve güncel listeyi çek
+  // Add new stage and refresh the list
   const addNewStage = async () => {
     if (!newStageName.trim()) return;
 
@@ -191,7 +224,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
 
       setNewStageName('');
       setNewStageNote('');
-      await loadTaskStages(); // Güncel aşama listesini çek
+      await loadTaskStages();
     } catch (error) {
       console.error('Error creating stage:', error);
       alert('Aşama oluşturulurken hata oluştu!');
@@ -205,7 +238,14 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
       try {
         await deleteTaskStage(stageId);
         await loadTaskStages();
-        setSelectedStages(selectedStages.filter((stage) => stage.id !== stageId));
+
+        setSelectedStageIds(prev => prev.filter(id => id !== stageId));
+
+        setNodes((nds) => {
+          const filteredNodes = nds.filter((n) => n.data.stageId !== stageId);
+          setEdges(createSequentialEdges(filteredNodes));
+          return filteredNodes;
+        });
       } catch (error) {
         console.error('Error deleting stage:', error);
         alert('Aşama silinirken hata oluştu!');
@@ -214,6 +254,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
     }
   };
 
+  // KAYDET: Node'ları edge sırasına göre sırala ve kaydet
   const handleSubmit = async () => {
     if (!name.trim()) {
       alert('Akış adı zorunludur!');
@@ -222,12 +263,18 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
 
     setLoading(true);
     try {
+      const orderedStageIds = getOrderedStageIds(nodes, edges);
+
       await onSave({
         name: name.trim(),
         note: note.trim(),
-        stages: selectedStages,
-        nodes,
-        edges,
+        stages: availableStages
+          .filter(stage => stage.id !== undefined && orderedStageIds.includes(stage.id as number))
+          .sort(
+            (a, b) =>
+              orderedStageIds.indexOf(a.id as number) -
+              orderedStageIds.indexOf(b.id as number)
+          ),
       });
     } catch (error) {
       console.error('Error saving workflow:', error);
@@ -360,13 +407,17 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
                               key={stage.id}
                               draggable
                               onDragStart={(e) => {
+                                const stageData = JSON.stringify({
+                                  stageName: stage.name,
+                                  stageId: stage.id
+                                });
                                 e.dataTransfer.setData(
                                   'application/reactflow',
-                                  stage.name
+                                  stageData
                                 );
                                 e.dataTransfer.effectAllowed = 'move';
                               }}
-                              className="stage-rect"
+                              className={`stage-rect ${stage.id !== undefined && selectedStageIds.includes(stage.id) ? 'selected' : ''}`}
                             >
                               <span className="stage-label">{stage.name}</span>
                               <button
@@ -421,7 +472,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
                   Sürükle-bırak ile akış oluştur • Sağ tık ile sil
                 </span>
                 <span className="text-secondary info-count">
-                  {nodes.length} adım • {edges.length} bağlantı
+                  {nodes.length} adım • Sıralı bağlantı
                 </span>
               </div>
 
