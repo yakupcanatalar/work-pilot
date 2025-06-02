@@ -1,7 +1,7 @@
 import axios from "axios";
 import CustomerDTO from './CustomerDTO';
 
-const API_URL = "http://localhost:8080/api/v1/";
+const API_URL = "http://137.184.83.58:8080/api/v1/";
 const CUSTOMER_URL = `${API_URL}customer`;
 
 // Create an Axios instance
@@ -27,7 +27,7 @@ axiosInstance.interceptors.request.use(
 );
 
 class CustomerService {
-    
+
     async getAllCustomers(): Promise<CustomerDTO[]> {
         try {
             const response = await axiosInstance.get(`${CUSTOMER_URL}`);
@@ -76,7 +76,7 @@ class CustomerService {
         }
     }
 
-    async createCustomer(customerData: CustomerDTO){
+    async createCustomer(customerData: CustomerDTO) {
         try {
             await axiosInstance.post(`${CUSTOMER_URL}`, customerData);
         } catch (error) {
@@ -85,7 +85,7 @@ class CustomerService {
         }
     }
 
-    async updateCustomer(customerId: number, customerData: CustomerDTO){
+    async updateCustomer(customerId: number, customerData: CustomerDTO) {
         try {
             await axiosInstance.put(`${CUSTOMER_URL}/${customerId}`, customerData);
         } catch (error) {
@@ -106,7 +106,7 @@ class CustomerService {
     async searchCustomers(searchText: string, name?: string, phoneNumber?: string, email?: string, page?: number, pageSize?: number): Promise<CustomerDTO[]> {
         try {
             const response = await axiosInstance.get(`${CUSTOMER_URL}/search`, {
-                params: { 
+                params: {
                     q: searchText,
                     name,
                     phoneNumber,

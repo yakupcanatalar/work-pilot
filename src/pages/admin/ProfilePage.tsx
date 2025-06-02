@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
   });
 
   useEffect(() => {
-    fetch('/user/profile')
+    fetch('/users/profile')
       .then(response => response.json())
       .then(data => setProfile({ ...profile, ...data }));
     // eslint-disable-next-line
@@ -36,7 +36,7 @@ const Profile: React.FC = () => {
   };
 
   const handleProfileUpdate = () => {
-    fetch('/user/profile', {
+    fetch('/users/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(profile)
@@ -45,7 +45,7 @@ const Profile: React.FC = () => {
   };
 
   const handlePasswordChange = () => {
-    fetch('/user/password', {
+    fetch('/users/password', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

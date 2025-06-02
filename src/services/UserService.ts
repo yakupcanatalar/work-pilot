@@ -1,12 +1,12 @@
 // services/authService.ts
 import axios from "axios";
-import { UserData} from "../types/UserData";
+import { UserData } from "../types/UserData";
 // import { ErrorResponse } from "../types/ErrorResponse";
-import { AuthResponse } from "../types/AuthResponse";   
+import { AuthResponse } from "../types/AuthResponse";
 import { LoginData } from "../types/LoginData";
 
 // ---------- API URLS ----------
-const API_URL = "http://localhost:8080/api/v1/";
+const API_URL = "http://137.184.83.58:8080/api/v1/";
 const AUTH_URL = `${API_URL}auth`;
 
 // ---------- Axios Instance with Bearer Token ----------
