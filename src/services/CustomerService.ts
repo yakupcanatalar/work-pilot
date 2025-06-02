@@ -1,7 +1,7 @@
 import axios from "axios";
 import CustomerDTO from './CustomerDTO';
 
-const API_URL = "https://137.184.83.58:8080/api/v1/";
+const API_URL = "http://137.184.83.58:8080/api/v1/";
 const CUSTOMER_URL = `${API_URL}customer`;
 
 // Create an Axios instance
