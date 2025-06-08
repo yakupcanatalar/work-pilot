@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, Outlet } from "react-router-dom";
-import Navigation from "./components/Navigation";
-import Container from "react-bootstrap/Container";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
@@ -15,6 +13,7 @@ import StatisticsPage from "./pages/admin/Statistics";
 import TaskPage from "./pages/admin/Task";
 import WorkflowPage from "./pages/admin/Workflow";
 import SettingsPage from "./pages/Settings";
+import Navigation from "./components/Navigation";
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute: React.FC = () => {
@@ -26,10 +25,10 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const showNavigation = !location.pathname.startsWith("/admin");
 
-  return (
+   return (
     <>
       {showNavigation && <Navigation />}
-      <div>
+  <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Routes>
           {/* Admin Routes - Protected */}
           <Route path="/admin" element={<PrivateRoute />}>

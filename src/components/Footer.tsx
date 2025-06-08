@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 
 const Footer: React.FC = () => {
-  const navigate = useNavigate();
   return (
     <footer className="footer-custom py-3">
       <Container className="text-center">

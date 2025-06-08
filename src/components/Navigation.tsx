@@ -4,8 +4,36 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRocket } from '@fortawesome/free-solid-svg-icons';
 
+// Gradient ve outline stilleri
+const gradientStyle = {
+  background: 'linear-gradient(90deg, #6f42c1, #0d6efd)',
+  border: 'none',
+  color: '#fff',
+  fontWeight: 500,
+  transition: 'transform 0.2s, box-shadow 0.2s'
+};
+
+const outlineGradientStyle = {
+  background: 'transparent',
+  border: '2px solid #6f42c1',
+  color: '#6f42c1',
+  fontWeight: 500,
+  transition: 'transform 0.2s, box-shadow 0.2s'
+};
+
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
+
+  // Hover animasyonunu eklemek için event handler
+  const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)';
+    e.currentTarget.style.boxShadow = '0 4px 16px 0 rgba(111,66,193,0.12)';
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = '';
+    e.currentTarget.style.boxShadow = '';
+  };
 
   return (
     <Navbar bg="white" expand="lg" className="py-3 border-bottom">
@@ -31,18 +59,22 @@ const Navigation: React.FC = () => {
         {/* Sağ Tarafta Auth Butonları */}
         <div className="d-flex">
           <Button
-            variant="outline-primary"
             onClick={() => navigate('/login')}
             className="me-2 px-3 py-2"
-            style={{ fontWeight: '500' }}
+            style={outlineGradientStyle}
+            variant="light"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             Giriş Yap
           </Button>
           <Button
-            variant="primary"
             onClick={() => navigate('/register')}
             className="px-3 py-2"
-            style={{ fontWeight: '500' }}
+            style={gradientStyle}
+            variant="light"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             Kayıt Ol
           </Button>

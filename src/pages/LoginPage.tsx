@@ -47,6 +47,7 @@ const LoginPage: React.FC = () => {
     <div className="login-bg">
       <Card className="login-card">
         <Card.Body>
+          <h4 className="text-center mb-4" style={{ color: '#6f42c1', fontWeight: 700 }}>Giriş Yap</h4>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
