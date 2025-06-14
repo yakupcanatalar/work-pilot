@@ -1,13 +1,11 @@
 // services/authService.ts
 import axios from "axios";
 import { UserData } from "../types/UserData";
-// import { ErrorResponse } from "../types/ErrorResponse";
 import { AuthResponse } from "../types/AuthResponse";
 import { LoginData } from "../types/LoginData";
 
-// ---------- API URLS ----------
-const API_URL = "http://137.184.83.58:8080/api/v1/";
-//const API_URL = "http://localhost:8080/api/v1/";
+//const API_URL = "http://137.184.83.58:8080/api/v1/";
+const API_URL = "http://localhost:8080/api/v1/";
 const AUTH_URL = `${API_URL}auth`;
 
 const axiosInstance = axios.create({
@@ -26,10 +24,14 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ---------- Auth Functions ----------
-export const registerUser = async (userData: UserData): Promise<AuthResponse> => {
+export const registerUser = async (
+  userData: UserData
+): Promise<AuthResponse> => {
   try {
-    const response = await axiosInstance.post<AuthResponse>(`${AUTH_URL}/register`, userData);
+    const response = await axiosInstance.post<AuthResponse>(
+      `${AUTH_URL}/register`,
+      userData
+    );
     return response.data;
   } catch (error: any) {
     if (error.response) {
@@ -41,7 +43,10 @@ export const registerUser = async (userData: UserData): Promise<AuthResponse> =>
 };
 
 export const loginUser = async (userData: LoginData): Promise<AuthResponse> => {
-  const response = await axiosInstance.put<AuthResponse>(`${AUTH_URL}/authenticate`, userData);
+  const response = await axiosInstance.put<AuthResponse>(
+    `${AUTH_URL}/authenticate`,
+    userData
+  );
   return response.data;
 };
 
@@ -50,6 +55,8 @@ export const logoutUser = async (): Promise<void> => {
 };
 
 export const refreshToken = async (): Promise<AuthResponse> => {
-  const response = await axiosInstance.post<AuthResponse>(`${AUTH_URL}/refresh`);
+  const response = await axiosInstance.post<AuthResponse>(
+    `${AUTH_URL}/refresh`
+  );
   return response.data;
 };

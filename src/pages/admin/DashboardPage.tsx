@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Card, Container } from 'react-bootstrap';
+import { Row, Col, Card, Container, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
@@ -11,10 +11,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import PageHeader from '../../components/PageHeader';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
-import CustomerDTO from '../../dtos/CustomerDTO';
+import FlowBuilder from '../admin/FlowBuilder'; // FlowBuilder'ı import ediyoruz
+import CustomerDto from '../../dtos/CustomerDto';
 import CustomerService from '../../services/CustomerService';
+import TaskStageDto from '../../dtos/TaskStageDto';
+import { createTask } from '../../services/TaskService'; // API çağrısı için import
 
-const emptyCustomer: CustomerDTO = {
+const emptyCustomer: CustomerDto = {
   id: 0,
   name: '',
   phoneNumber: '',
@@ -31,12 +34,14 @@ const DashboardPage: React.FC = () => {
     { title: 'Productivity', value: '87%', icon: faChartLine, color: 'warning' }
   ];
 
-  // Modal state
   const [showAddModal, setShowAddModal] = useState(false);
-  const [modalCustomer, setModalCustomer] = useState<CustomerDTO>(emptyCustomer);
+  const [modalCustomer, setModalCustomer] = useState<CustomerDto>(emptyCustomer);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
+  const [showFlowBuilder, setShowFlowBuilder] = useState(false);
+  
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
   const handleShowAddModal = () => {
     setModalCustomer(emptyCustomer);
@@ -60,10 +65,44 @@ const DashboardPage: React.FC = () => {
     setLoading(true);
     try {
       await CustomerService.createCustomer(modalCustomer);
-      setShowAddModal(false); // Modalı kapat
-      setModalCustomer(emptyCustomer); // Formu temizle
+      setShowAddModal(false);
+      setModalCustomer(emptyCustomer);
     } catch (err) {
       console.error('Error saving customer:', err);
+    }
+    setLoading(false);
+  };
+
+  const handleShowFlowBuilder = () => {
+    setShowFlowBuilder(true);
+  };
+
+  const handleCloseFlowBuilder = () => {
+    setShowFlowBuilder(false);
+  };
+
+  const handleSaveFlow = async (flowData: { name: string; note: string; stages: TaskStageDto[] }) => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const taskData = {
+        name: flowData.name,
+        note: flowData.note,
+        stageIds: flowData.stages.map(stage => stage.id!).filter(id => id !== undefined)
+      };
+
+      await createTask(taskData);
+      setSuccess('İş akışı başarıyla oluşturuldu!');
+      
+      // Modal'ı kapat
+      setShowFlowBuilder(false);
+      
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      console.error('Error saving workflow:', error);
+      setError('İş akışı kaydedilirken hata oluştu!');
     }
     setLoading(false);
   };
@@ -74,7 +113,6 @@ const DashboardPage: React.FC = () => {
         <PageHeader title="Dashboard" icon={faTachometerAlt} />
       </div>
 
-      {/* Stats Cards */}
       <Row className="mb-4">
         {stats.map((stat, index) => (
           <Col key={index} md={3} sm={6} className="mb-3">
@@ -93,7 +131,6 @@ const DashboardPage: React.FC = () => {
         ))}
       </Row>
 
-      {/* Recent Activities */}
       <Row>
         <Col md={8}>
           <Card className="mb-4">
@@ -101,7 +138,6 @@ const DashboardPage: React.FC = () => {
               <h5>Recent Activities</h5>
             </Card.Header>
             <Card.Body>
-              {/* Activity list would go here */}
               <p>No recent activities</p>
             </Card.Body>
           </Card>
@@ -123,7 +159,10 @@ const DashboardPage: React.FC = () => {
                 <FontAwesomeIcon icon={faTasks} className="me-2" />
                 Yeni Görev
               </button>
-              <button className="btn btn-info w-100">
+              <button 
+                className="btn btn-info w-100"
+                onClick={handleShowFlowBuilder}
+              >
                 <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />
                 Yeni Akış
               </button>
@@ -132,7 +171,6 @@ const DashboardPage: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Add/Edit Customer Modal */}
       <AddEditCustomerModal
         show={showAddModal}
         isEdit={false}
@@ -141,6 +179,12 @@ const DashboardPage: React.FC = () => {
         onChange={handleModalChange}
         onClose={handleCloseAddModal}
         onSave={handleSave}
+      />
+      <FlowBuilder
+        show={showFlowBuilder}
+        onHide={handleCloseFlowBuilder}
+        onSave={handleSaveFlow}
+        task={null}
       />
     </Container>
   );

@@ -4,7 +4,7 @@ import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner } f
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import CustomerService from '../../services/CustomerService';
-import CustomerDTO from '../../dtos/CustomerDTO';
+import CustomerDto from '../../dtos/CustomerDto';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
 import CustomerDetailModal from '../../components/modals/CustomerDetailModal';
 import DeleteCustomerModal from '../../components/modals/DeleteCustomerModal';
@@ -16,7 +16,7 @@ const CUSTOMER_EMAIL_MAX_LENGTH = 255;
 const CUSTOMER_ADDRESS_MAX_LENGTH = 1000;
 const CUSTOMER_NOTE_MAX_LENGTH = 255;
 
-const emptyCustomer: CustomerDTO = {
+const emptyCustomer: CustomerDto = {
   id: 0,
   name: '',
   phoneNumber: '',
@@ -26,15 +26,15 @@ const emptyCustomer: CustomerDTO = {
 };
 
 const CustomerPage: React.FC = () => {
-  const [customers, setCustomers] = useState<CustomerDTO[]>([]);
+  const [customers, setCustomers] = useState<CustomerDto[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [modalCustomer, setModalCustomer] = useState<CustomerDTO>(emptyCustomer);
+  const [modalCustomer, setModalCustomer] = useState<CustomerDto>(emptyCustomer);
   const [isEdit, setIsEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
-  const [detailCustomer, setDetailCustomer] = useState<CustomerDTO | null>(null);
+  const [detailCustomer, setDetailCustomer] = useState<CustomerDto | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [formError, setFormError] = useState<{
     name?: string;
@@ -77,7 +77,7 @@ const CustomerPage: React.FC = () => {
     (customer.note && customer.note.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const handleShowEditModal = (customer: CustomerDTO) => {
+  const handleShowEditModal = (customer: CustomerDto) => {
     setModalCustomer(customer);
     setIsEdit(true);
     setShowModal(true);
@@ -189,7 +189,7 @@ const CustomerPage: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleShowDetail = (customer: CustomerDTO) => {
+  const handleShowDetail = (customer: CustomerDto) => {
     setDetailCustomer(customer);
     setShowDetail(true);
   };
@@ -232,7 +232,7 @@ const CustomerPage: React.FC = () => {
                 disabled={loading}
               >
                 <FontAwesomeIcon icon={faUser} className="me-2" />
-                + Ekle
+                Yeni Müşteri
               </Button>
             </Col>
           </Row>

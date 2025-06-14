@@ -11,23 +11,22 @@ import ReactFlow, {
   MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { getAllTaskStages, createTaskStage, deleteTaskStage, TaskStageDto } from '../../services/TaskStage';
+import { getAllTaskStages, createTaskStage, deleteTaskStage } from '../../services/TaskStage';
 import '../../assets/styles/flow.css';
-import Task from '../../services/Task';
+import TaskStageDto from '../../dtos/TaskStageDto';
+import TaskDto from '../../dtos/TaskDto';
 
 interface FlowBuilderProps {
   show: boolean;
   onHide: () => void;
   onSave: (flowData: { name: string; note: string; stages: TaskStageDto[] }) => Promise<void>;
-  task?: Task | null;
+  task?: TaskDto | null;
 }
 
 function getOrderedStageIds(nodes: Node[], edges: Edge[]): number[] {
   if (nodes.length === 0) return [];
-  const sourceIds = edges.map(e => e.source);
   const targetIds = edges.map(e => e.target);
 
-  // Başlangıç node'unu bul (source olup target olmayan)
   let startNode = nodes.find(n => !targetIds.includes(n.id));
   if (!startNode) startNode = nodes[0];
 
@@ -54,7 +53,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
   const [loading, setLoading] = useState(false);
   const [newStageNote, setNewStageNote] = useState('');
 
-  // Load task stages from API
   const loadTaskStages = async () => {
     try {
       const stages = await getAllTaskStages();
@@ -64,7 +62,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
     }
   };
 
-  // Create edges based on node order
   const createSequentialEdges = (nodeList: Node[]): Edge[] => {
     const edgeList: Edge[] = [];
     for (let i = 0; i < nodeList.length - 1; i++) {
@@ -79,7 +76,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
     return edgeList;
   };
 
-  // Initialize data
   useEffect(() => {
     if (show) {
       loadTaskStages();
@@ -88,7 +84,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
         setName(task.name || '');
         setNote(task.note || '');
 
-        const stageIds = task.stages?.map(stage => stage.id) || [];
+        const stageIds = task.stages?.map(stage => stage.id).filter((id): id is number => id !== undefined) || [];
         setSelectedStageIds(stageIds);
 
         if (task.stages && task.stages.length > 0) {
@@ -119,7 +115,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
         setEdges([]);
       }
     }
-    // eslint-disable-next-line
   }, [task, show]);
 
   const onConnect = useCallback(
@@ -161,7 +156,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
 
       const newNodeId = `node-${stageId}`;
 
-      // Check if stage is already added
       const existingNode = nodes.find(node => node.data.stageId === stageId);
       if (existingNode) {
         alert('Bu aşama zaten eklenmiş!');
@@ -211,7 +205,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
     [setNodes, setEdges]
   );
 
-  // Add new stage and refresh the list
   const addNewStage = async () => {
     if (!newStageName.trim()) return;
 
@@ -254,7 +247,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
     }
   };
 
-  // KAYDET: Node'ları edge sırasına göre sırala ve kaydet
   const handleSubmit = async () => {
     if (!name.trim()) {
       alert('Akış adı zorunludur!');
@@ -439,7 +431,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
               </Card>
             </div>
 
-            {/* Flow Area */}
             <div className="d-flex flex-column flex-grow-1 position-relative flow-area">
               <ReactFlowProvider>
                 <div className="flex-grow-1 flow-reactflow">
@@ -465,7 +456,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
 
           <Card.Footer className="py-2 bg-light border-top">
             <div className="d-flex align-items-center justify-content-between gap-2">
-              {/* Sol taraf - Kısa bilgi */}
               <div className="d-flex align-items-center gap-2 justify-content-center w-100">
                 <span className="icon-tip">💡</span>
                 <span className="text-muted info-text">
@@ -476,7 +466,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
                 </span>
               </div>
 
-              {/* Sağ taraf - Butonlar */}
               <div className="d-flex gap-2">
                 <Button
                   variant="outline-secondary"

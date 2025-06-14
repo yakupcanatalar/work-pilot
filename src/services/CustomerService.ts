@@ -1,11 +1,10 @@
 import axios from "axios";
-import CustomerDTO from '../dtos/CustomerDTO';
+import CustomerDto from '../dtos/CustomerDto';
 
-//const API_URL = "http://localhost:8080/api/v1/";
-const API_URL = "http://137.184.83.58:8080/api/v1/";
+const API_URL = "http://localhost:8080/api/v1/";
+//const API_URL = "http://137.184.83.58:8080/api/v1/";
 const CUSTOMER_URL = `${API_URL}customer`;
 
-// Create an Axios instance
 const axiosInstance = axios.create({
     baseURL: API_URL,
 });
@@ -28,7 +27,7 @@ axiosInstance.interceptors.request.use(
 
 class CustomerService {
 
-    async getAllCustomers(): Promise<CustomerDTO[]> {
+    async getAllCustomers(): Promise<CustomerDto[]> {
         try {
             const response = await axiosInstance.get(`${CUSTOMER_URL}`);
             const data = response.data as { content: any[] | { customers: any[] } };
@@ -36,7 +35,7 @@ class CustomerService {
             if (!Array.isArray(customers)) {
                 throw new Error('Invalid response format: expected an array of customers');
             }
-            return customers.map((customer: any) => new CustomerDTO(
+            return customers.map((customer: any) => new CustomerDto(
                 customer.id,
                 customer.user_id,
                 customer.name,
@@ -53,11 +52,11 @@ class CustomerService {
         }
     }
 
-    async getCustomerById(customerId: string): Promise<CustomerDTO> {
+    async getCustomerById(customerId: string): Promise<CustomerDto> {
         try {
             const response = await axiosInstance.get(`${CUSTOMER_URL}/${customerId}`);
             const customer = (response.data as { content: any }).content;
-            return new CustomerDTO(
+            return new CustomerDto(
                 customer.id,
                 customer.user_id,
                 customer.name,
@@ -74,7 +73,7 @@ class CustomerService {
         }
     }
 
-    async createCustomer(customerData: CustomerDTO) {
+    async createCustomer(customerData: CustomerDto) {
         try {
             await axiosInstance.post(`${CUSTOMER_URL}`, customerData);
         } catch (error) {
@@ -83,7 +82,7 @@ class CustomerService {
         }
     }
 
-    async updateCustomer(customerId: number, customerData: CustomerDTO) {
+    async updateCustomer(customerId: number, customerData: CustomerDto) {
         try {
             await axiosInstance.put(`${CUSTOMER_URL}/${customerId}`, customerData);
         } catch (error) {
@@ -101,7 +100,7 @@ class CustomerService {
         }
     }
 
-    async searchCustomers(searchText: string, name?: string, phoneNumber?: string, email?: string, page?: number, pageSize?: number): Promise<CustomerDTO[]> {
+    async searchCustomers(searchText: string, name?: string, phoneNumber?: string, email?: string, page?: number, pageSize?: number): Promise<CustomerDto[]> {
         try {
             const response = await axiosInstance.get(`${CUSTOMER_URL}/search`, {
                 params: {
@@ -118,7 +117,7 @@ class CustomerService {
             if (!Array.isArray(customers)) {
                 throw new Error('Invalid response format: expected an array of customers');
             }
-            return customers.map((customer: any) => new CustomerDTO(
+            return customers.map((customer: any) => new CustomerDto(
                 customer.id,
                 customer.user_id,
                 customer.name,

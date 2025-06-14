@@ -1,16 +1,14 @@
 import axios from "axios";
 
-const API_URL = "http://137.184.83.58:8080/api/v1/";
-//const API_URL = "http://localhost:8080/api/v1/";
+//const API_URL = "http://137.184.83.58:8080/api/v1/";
+const API_URL = "http://localhost:8080/api/v1/";
 
 const TASK_URL = `${API_URL}task`;
 
-// Create an Axios instance
 const axiosInstance = axios.create({
   baseURL: API_URL,
 });
 
-// Add a request interceptor to include the Bearer token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken"); // Adjust this to where you store your token
@@ -27,7 +25,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Create a new task
 export const createTask = async (taskData: { name: string; note: string; stageIds: number[] }) => {
   try {
     const response = await axiosInstance.post(TASK_URL, taskData);
@@ -37,7 +34,6 @@ export const createTask = async (taskData: { name: string; note: string; stageId
   }
 };
 
-// Get all tasks
 export const getTasks = async () => {
   try {
     const response = await axiosInstance.get(TASK_URL);
@@ -59,7 +55,6 @@ export const getTasks = async () => {
   }
 };
 
-// Get a task by ID
 export const getTaskById = async (taskId: number) => {
   try {
     const response = await axiosInstance.get(`${TASK_URL}/${taskId}`);
@@ -69,7 +64,6 @@ export const getTaskById = async (taskId: number) => {
   }
 };
 
-// Delete a task by ID
 export const deleteTaskById = async (taskId: number) => {
   try {
     const response = await axiosInstance.delete(`${TASK_URL}/${taskId}`);
@@ -79,7 +73,6 @@ export const deleteTaskById = async (taskId: number) => {
   }
 };
 
-// Update a task by ID
 export const updateTaskById = async (taskId: number, taskData: { name: string; note: string; stageIds: number[] }) => {
   try {
     const response = await axiosInstance.put(`${TASK_URL}/${taskId}`, taskData);

@@ -24,7 +24,6 @@ const Profile: React.FC = () => {
     fetch('/users/profile')
       .then(response => response.json())
       .then(data => setProfile({ ...profile, ...data }));
-    // eslint-disable-next-line
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

@@ -1,12 +1,12 @@
 import React from "react";
 import { Modal, Card, Button, Form, Spinner, Alert } from "react-bootstrap";
-import CustomerDTO from "../../dtos/CustomerDTO";
+import CustomerDto from "../../dtos/CustomerDto";
 
 interface Props {
   show: boolean;
   isEdit: boolean;
   loading: boolean;
-  customer: CustomerDTO;
+  customer: CustomerDto;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onClose: () => void;
   onSave: () => void;

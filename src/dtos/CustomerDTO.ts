@@ -1,4 +1,4 @@
-class CustomerDTO {
+class CustomerDto {
   id?: number;
   userId?: string;
   name: string;
@@ -33,4 +33,4 @@ class CustomerDTO {
   }
 }
 
-export default CustomerDTO;
+export default CustomerDto;

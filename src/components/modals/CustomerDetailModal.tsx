@@ -2,11 +2,11 @@ import React from "react";
 import { Modal, Card, Button, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
-import CustomerDTO from "../../dtos/CustomerDTO";
+import CustomerDto from "../../dtos/CustomerDto";
 
 interface Props {
   show: boolean;
-  customer: CustomerDTO | null;
+  customer: CustomerDto | null;
   onClose: () => void;
 }
 

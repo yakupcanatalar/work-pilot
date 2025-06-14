@@ -4,24 +4,24 @@ import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner, Mo
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import { getTasks, createTask, updateTaskById, deleteTaskById } from '../../services/TaskService';
-import { TaskStageDto } from '../../services/TaskStage';
 import FlowBuilder from './FlowBuilder';
-import Task from '../../services/Task';
 import '../../assets/styles/flow.css';
+import TaskDto from '../../dtos/TaskDto';
+import TaskStageDto, { TaskStageStatus } from '../../dtos/TaskStageDto';
 
 
 const WorkflowPage: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
   const [showFlowBuilder, setShowFlowBuilder] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<TaskDto | null>(null);
   const [showDelete, setShowDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [showDetail, setShowDetail] = useState(false);
-  const [detailTask, setDetailTask] = useState<Task | null>(null);
+  const [detailTask, setDetailTask] = useState<TaskDto | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
@@ -42,11 +42,20 @@ const WorkflowPage: React.FC = () => {
     setLoading(false);
   };
 
-  const filteredTasks = tasks.filter(task =>
-    (task.name && task.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (task.note && task.note.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (task.stages && task.stages.some(stage => stage.name.toLowerCase().includes(searchQuery.toLowerCase())))
-  );
+  // Sadece ACTIVE durumundaki stage'leri filtrele
+  const getActiveStages = (stages: TaskStageDto[] | undefined): TaskStageDto[] => {
+    if (!stages) return [];
+    return stages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
+  };
+
+  const filteredTasks = tasks.filter(task => {
+    const activeStages = getActiveStages(task.stages);
+    return (
+      (task.name && task.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (task.note && task.note.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (activeStages && activeStages.some(stage => stage.name.toLowerCase().includes(searchQuery.toLowerCase())))
+    );
+  });
 
   const totalPages = Math.ceil(filteredTasks.length / pageSize);
   const paginatedTasks = filteredTasks.slice(
@@ -54,19 +63,12 @@ const WorkflowPage: React.FC = () => {
     currentPage * pageSize
   );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
-
-  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPageSize(Number(e.target.value));
-    setCurrentPage(1);
-  };
-
   const handleShowAddModal = () => {
     setEditingTask(null);
     setShowFlowBuilder(true);
   };
 
-  const handleShowEditModal = (task: Task) => {
+  const handleShowEditModal = (task: TaskDto) => {
     setEditingTask(task);
     setShowFlowBuilder(true);
   };
@@ -81,13 +83,15 @@ const WorkflowPage: React.FC = () => {
     setSuccess('');
 
     try {
+      const activeStages = flowData.stages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
+      
       const taskData = {
         name: flowData.name,
         note: flowData.note,
-        stageIds: flowData.stages.map(stage => stage.id!).filter(id => id !== undefined)
+        stageIds: activeStages.map(stage => stage.id!).filter(id => id !== undefined)
       };
 
-      if (editingTask) {
+      if (editingTask && editingTask.id) {
         await updateTaskById(editingTask.id, taskData);
         setSuccess('İş akışı başarıyla güncellendi!');
       } else {
@@ -132,7 +136,7 @@ const WorkflowPage: React.FC = () => {
     }
   };
 
-  const handleShowDetail = (task: Task) => {
+  const handleShowDetail = (task: TaskDto) => {
     setDetailTask(task);
     setShowDetail(true);
   };
@@ -142,9 +146,14 @@ const WorkflowPage: React.FC = () => {
     setDetailTask(null);
   };
 
-  const getFlowSummary = (task: Task) => {
-    const stageCount = task.stages?.length || 0;
+  const getFlowSummary = (task: TaskDto) => {
+    const activeStages = getActiveStages(task.stages);
+    const stageCount = activeStages.length;
     return `${stageCount} aşama`;
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   const handleRefresh = () => {
@@ -157,7 +166,6 @@ const WorkflowPage: React.FC = () => {
     <Container className="py-4">
       <PageHeader title="İş Akışları" icon={faProjectDiagram} />
 
-      {/* Alert Messages */}
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError('')}>
           {error}
@@ -178,8 +186,7 @@ const WorkflowPage: React.FC = () => {
                   type="text"
                   placeholder="İş akışı adı, not veya aşama adına göre ara..."
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="bg-light"
+                  onChange={handleSearchChange}
                 />
                 <Button variant="outline-secondary" onClick={handleRefresh} disabled={loading}>
                   {loading ? <Spinner size="sm" animation="border" /> : 'Yenile'}
@@ -188,20 +195,11 @@ const WorkflowPage: React.FC = () => {
             </Col>
             <Col md={4} className="d-flex justify-content-end gap-2">
               <Button
-                variant="outline-primary"
-                onClick={handleRefresh}
-                disabled={loading}
-                title="Listeyi yenile"
-              >
-                <FontAwesomeIcon icon={faProjectDiagram} />
-              </Button>
-              <Button
-                variant="primary"
-                className="d-flex align-items-center"
+                variant="success"
                 onClick={handleShowAddModal}
                 disabled={loading}
               >
-                <FontAwesomeIcon icon={faPlus} className="me-2" />
+                <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />
                 Yeni İş Akışı
               </Button>
             </Col>
@@ -217,27 +215,32 @@ const WorkflowPage: React.FC = () => {
               </small>
             </Card.Header>
           </Card>
-
           <Row>
             <Col md={12}>
-              <div className="table-responsive">
-                <Table hover bordered className="align-middle table-striped shadow-sm rounded">
+              <div
+                className="table-responsive"
+                style={{ maxHeight: 700, overflowY: 'auto' }}
+              >
+                <Table
+                  hover
+                  bordered
+                  className="align-middle table-striped shadow-sm rounded"
+                >
                   <thead className="table-light">
                     <tr>
-                      <th style={{ width: '60px' }}>Sıra</th>
+                      <th>Sıra</th>
                       <th>İş Akışı Adı</th>
                       <th>Notlar</th>
                       <th>Akış Özeti</th>
                       <th>Aşamalar</th>
-                      <th style={{ width: '140px' }}>İşlemler</th>
+                      <th>İşlemler</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       <tr>
                         <td colSpan={6} className="text-center py-4">
-                          <Spinner animation="border" size="sm" className="me-2" />
-                          Yükleniyor...
+                          <Spinner animation="border" size="sm" /> Yükleniyor...
                         </td>
                       </tr>
                     ) : filteredTasks.length === 0 ? (
@@ -247,37 +250,39 @@ const WorkflowPage: React.FC = () => {
                         </td>
                       </tr>
                     ) : (
-                      paginatedTasks.map((task, index) => (
-                        <tr key={task.id}>
-                          <td className="text-center">
-                            {(currentPage - 1) * pageSize + index + 1}
-                          </td>
-                          <td>
-                            <span
-                              style={{ color: '#0d6efd', fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+                      paginatedTasks.map((task, index) => {
+                        const activeStages = getActiveStages(task.stages);
+                        return (
+                          <tr key={task.id}>
+                            <td className="text-center">
+                              {(currentPage - 1) * pageSize + index + 1}
+                            </td>
+                            <td>
+                            <div
+                              style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                               onClick={() => handleShowDetail(task)}
                             >
-                              {task.name}
+                              <span className="fw-semibold text-primary">{task.name}</span>
                               <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" size="sm" />
-                            </span>
-                          </td>
-                          <td className="text-center">
-                            <small className="text-muted">{task.note}</small>
+                            </div>
                           </td>
                           <td>
-                            <small className="text-muted">{getFlowSummary(task)}</small>
+                            <span className="text-muted">{task.note}</span>
                           </td>
                           <td>
-                            {task.stages && task.stages.length > 0 ? (
+                            <span className="text-muted">{getFlowSummary(task)}</span>
+                          </td>
+                          <td>
+                            {activeStages.length > 0 ? (
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                                {task.stages.slice(0, 3).map(stage => (
+                                {activeStages.slice(0, 3).map(stage => (
                                   <span key={stage.id} className="badge bg-light text-dark border">
                                     {stage.name}
                                   </span>
                                 ))}
-                                {task.stages.length > 3 && (
+                                {activeStages.length > 3 && (
                                   <span className="badge bg-secondary">
-                                    +{task.stages.length - 3} daha
+                                    +{activeStages.length - 3} daha
                                   </span>
                                 )}
                               </div>
@@ -286,7 +291,7 @@ const WorkflowPage: React.FC = () => {
                             )}
                           </td>
                           <td>
-                            <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
+                            <div className="d-flex gap-1 justify-content-center">
                               <Button
                                 variant="outline-info"
                                 size="sm"
@@ -307,7 +312,11 @@ const WorkflowPage: React.FC = () => {
                               <Button
                                 variant="outline-danger"
                                 size="sm"
-                                onClick={() => handleDelete(task.id)}
+                                onClick={() => {
+                                  if (task?.id !== undefined) {
+                                    handleDelete(task.id);
+                                  }
+                                }}
                                 title="Sil"
                                 disabled={loading}
                               >
@@ -316,7 +325,8 @@ const WorkflowPage: React.FC = () => {
                             </div>
                           </td>
                         </tr>
-                      ))
+                        );
+                      })
                     )}
                   </tbody>
                 </Table>
@@ -327,27 +337,13 @@ const WorkflowPage: React.FC = () => {
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <Row className="mt-3">
-              <Col className="d-flex justify-content-between align-items-center">
-                <div>
-                  <Form.Select
-                    size="sm"
-                    value={pageSize}
-                    onChange={handlePageSizeChange}
-                    style={{ width: 'auto', display: 'inline-block' }}
-                  >
-                    {[5, 10, 20, 50].map(size => (
-                      <option key={size} value={size}>
-                        {size} kayıt
-                      </option>
-                    ))}
-                  </Form.Select>
-                </div>
+              <Col className="d-flex justify-content-center align-items-center">
                 <div className="d-flex align-items-center gap-2">
                   <Button
                     size="sm"
                     variant="outline-secondary"
                     disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
+                    onClick={() => setCurrentPage(currentPage - 1)}
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </Button>
@@ -358,7 +354,7 @@ const WorkflowPage: React.FC = () => {
                     size="sm"
                     variant="outline-secondary"
                     disabled={currentPage === totalPages}
-                    onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => setCurrentPage(currentPage + 1)}
                   >
                     <FontAwesomeIcon icon={faChevronRight} />
                   </Button>
@@ -369,15 +365,13 @@ const WorkflowPage: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Flow Builder Modal */}
       <FlowBuilder
         show={showFlowBuilder}
         onHide={() => setShowFlowBuilder(false)}
         onSave={handleSaveFlow}
         task={editingTask}
       />
-
-      {/* Delete Confirmation Modal */}
+      
       <Modal show={showDelete} onHide={() => setShowDelete(false)} centered>
         <Card className="shadow-sm m-0">
           <Card.Header>
@@ -425,20 +419,30 @@ const WorkflowPage: React.FC = () => {
                 </table>
 
                 <p><strong>Aşamalar:</strong></p>
-                {detailTask.stages && detailTask.stages.length > 0 ? (
-                  <div className="stage-flow">
-                    {detailTask.stages.map((stage, index) => (
-                      <React.Fragment key={stage.id}>
-                        <div className="stage-box">{stage.name}</div>
-                        {index !== detailTask.stages.length - 1 && (
-                          <div className="arrow">→</div>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted">Aşama bulunmamaktadır.</p>
-                )}
+                {(() => {
+                  const activeStages = getActiveStages(detailTask.stages);
+                  return activeStages.length > 0 ? (
+                    <div className="stage-flow">
+                      {activeStages.map((stage, index) => (
+                        <React.Fragment key={stage.id}>
+                          <div className="stage-box">
+                            {stage.name}
+                            {stage.note && (
+                              <div className="stage-note text-muted small">
+                                {stage.note}
+                              </div>
+                            )}
+                          </div>
+                          {index !== activeStages.length - 1 && (
+                            <div className="arrow">→</div>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted">Aktif aşama bulunmamaktadır.</p>
+                  );
+                })()}
               </>
             )}
           </Card.Body>
