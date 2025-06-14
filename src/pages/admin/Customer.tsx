@@ -1,10 +1,20 @@
 import { faUsers, faEdit, faTrash, faUser, faInfoCircle, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
-import { Table, Card, Button, Modal, Form, InputGroup, Container, Row, Col, Spinner } from 'react-bootstrap';
+import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import CustomerService from '../../services/CustomerService';
-import CustomerDTO from '../../services/CustomerDTO';
+import CustomerDTO from '../../dtos/CustomerDTO';
+import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
+import CustomerDetailModal from '../../components/modals/CustomerDetailModal';
+import DeleteCustomerModal from '../../components/modals/DeleteCustomerModal';
+
+const CUSTOMER_NAME_MAX_LENGTH = 100;
+const CUSTOMER_NAME_MIN_LENGTH = 2;
+const CUSTOMER_PHONE_NUMBER_LENGTH = 10;
+const CUSTOMER_EMAIL_MAX_LENGTH = 255;
+const CUSTOMER_ADDRESS_MAX_LENGTH = 1000;
+const CUSTOMER_NOTE_MAX_LENGTH = 255;
 
 const emptyCustomer: CustomerDTO = {
   id: 0,
@@ -13,7 +23,6 @@ const emptyCustomer: CustomerDTO = {
   email: '',
   address: '',
   note: '',
-  communicationPreference: 'NONE',
 };
 
 const CustomerPage: React.FC = () => {
@@ -27,9 +36,16 @@ const CustomerPage: React.FC = () => {
   const [showDetail, setShowDetail] = useState(false);
   const [detailCustomer, setDetailCustomer] = useState<CustomerDTO | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [formError, setFormError] = useState<{
+    name?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    note?: string;
+  }>({});
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchCustomers();
@@ -41,7 +57,7 @@ const CustomerPage: React.FC = () => {
       const data = await CustomerService.getAllCustomers();
       setCustomers(data);
     } catch (err) {
-      // handle error (show toast, etc.)
+      console.error('Error fetching customers:', err);
     }
     setLoading(false);
   };
@@ -50,6 +66,7 @@ const CustomerPage: React.FC = () => {
     setModalCustomer(emptyCustomer);
     setIsEdit(false);
     setShowModal(true);
+    setFormError({});
   };
 
   const filteredCustomers = customers.filter(customer =>
@@ -64,12 +81,14 @@ const CustomerPage: React.FC = () => {
     setModalCustomer(customer);
     setIsEdit(true);
     setShowModal(true);
+    setFormError({});
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setModalCustomer(emptyCustomer);
     setIsEdit(false);
+    setFormError({});
   };
 
   const handleModalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -80,7 +99,57 @@ const CustomerPage: React.FC = () => {
     }));
   };
 
+  const validateForm = () => {
+    let error: {
+      name?: string;
+      phone?: string;
+      email?: string;
+      address?: string;
+      note?: string;
+    } = {};
+
+    // Ad Soyad kontrolü
+    if (
+      !modalCustomer.name ||
+      modalCustomer.name.length < CUSTOMER_NAME_MIN_LENGTH ||
+      modalCustomer.name.length > CUSTOMER_NAME_MAX_LENGTH
+    ) {
+      error.name = `Ad Soyad ${CUSTOMER_NAME_MIN_LENGTH}-${CUSTOMER_NAME_MAX_LENGTH} karakter olmalı.`;
+    }
+
+    if (
+      !/^[1-9][0-9]{9}$/.test(modalCustomer.phoneNumber) ||
+      modalCustomer.phoneNumber.length !== CUSTOMER_PHONE_NUMBER_LENGTH
+    ) {
+      error.phone = "Telefon numarası 0 ile başlamamalı ve 10 haneli olmalı.";
+    }
+
+    if (modalCustomer.email) {
+      if (
+        modalCustomer.email.length > CUSTOMER_EMAIL_MAX_LENGTH
+      ) {
+        error.email = `E-posta en fazla ${CUSTOMER_EMAIL_MAX_LENGTH} karakter olmalı.`;
+      } else if (
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(modalCustomer.email)
+      ) {
+        error.email = "Geçerli bir e-posta adresi giriniz.";
+      }
+    }
+
+    if (modalCustomer.address && modalCustomer.address.length > CUSTOMER_ADDRESS_MAX_LENGTH) {
+      error.address = `Adres en fazla ${CUSTOMER_ADDRESS_MAX_LENGTH} karakter olmalı.`;
+    }
+
+    if (modalCustomer.note && modalCustomer.note.length > CUSTOMER_NOTE_MAX_LENGTH) {
+      error.note = `Not en fazla ${CUSTOMER_NOTE_MAX_LENGTH} karakter olmalı.`;
+    }
+
+    setFormError(error);
+    return Object.keys(error).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) return;
     setLoading(true);
     try {
       if (isEdit) {
@@ -91,7 +160,7 @@ const CustomerPage: React.FC = () => {
       await fetchCustomers();
       handleCloseModal();
     } catch (err) {
-      // handle error
+      console.error('Error saving customer:', err);
     }
     setLoading(false);
   };
@@ -137,15 +206,6 @@ const CustomerPage: React.FC = () => {
     currentPage * pageSize
   );
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPageSize(Number(e.target.value));
-    setCurrentPage(1);
-  };
-
   return (
     <Container className="py-4">
       <PageHeader title="Müşteriler" icon={faUsers} />
@@ -159,7 +219,6 @@ const CustomerPage: React.FC = () => {
                   placeholder="Ad, telefon, e-posta, adres veya nota göre ara..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  // className="bg-light"
                 />
                 <Button variant="outline-secondary" onClick={fetchCustomers} disabled={loading}>
                   {loading ? <Spinner size="sm" animation="border" /> : 'Yenile'}
@@ -170,7 +229,6 @@ const CustomerPage: React.FC = () => {
               <Button
                 variant="success"
                 onClick={handleShowAddModal}
-                // className="d-flex align-items-center"
                 disabled={loading}
               >
                 <FontAwesomeIcon icon={faUser} className="me-2" />
@@ -191,7 +249,10 @@ const CustomerPage: React.FC = () => {
           </Card>
           <Row>
             <Col md={12}>
-              <div className="table-responsive">
+              <div
+                className="table-responsive"
+                style={{ maxHeight: 700, overflowY: 'auto' }}
+              >
                 <Table
                   hover
                   bordered
@@ -229,7 +290,6 @@ const CustomerPage: React.FC = () => {
                           </td>
                           <td>
                             <div
-                              // className="d-flex align-items-center customer-detail-link"
                               style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                               onClick={() => handleShowDetail(customer)}
                             >
@@ -290,26 +350,13 @@ const CustomerPage: React.FC = () => {
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <Row className="mt-3">
-              <Col className="d-flex justify-content-between align-items-center">
-                <div>
-                  <Form.Select
-                    size="sm"
-                    value={pageSize}
-                    onChange={handlePageSizeChange}
-                  >
-                    {[5, 10, 20, 50].map(size => (
-                      <option key={size} value={size}>
-                        {size} kayıt
-                      </option>
-                    ))}
-                  </Form.Select>
-                </div>
+              <Col className="d-flex justify-content-center align-items-center">
                 <div className="d-flex align-items-center gap-2">
                   <Button
                     size="sm"
                     variant="outline-secondary"
                     disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
+                    onClick={() => setCurrentPage(currentPage - 1)}
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </Button>
@@ -320,7 +367,7 @@ const CustomerPage: React.FC = () => {
                     size="sm"
                     variant="outline-secondary"
                     disabled={currentPage === totalPages}
-                    onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => setCurrentPage(currentPage + 1)}
                   >
                     <FontAwesomeIcon icon={faChevronRight} />
                   </Button>
@@ -330,136 +377,29 @@ const CustomerPage: React.FC = () => {
           )}
         </Col>
       </Row>
+      <AddEditCustomerModal
+        show={showModal}
+        isEdit={isEdit}
+        loading={loading}
+        customer={modalCustomer}
+        onChange={handleModalChange}
+        onClose={handleCloseModal}
+        onSave={handleSave}
+        formError={formError}
+      />
 
-      {/* Add/Edit Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} centered>
-        <Card className="shadow-sm m-0">
-          <Card.Header>
-            <h5 className="mb-0">{isEdit ? 'Müşteri Güncelle' : 'Yeni Müşteri Ekle'}</h5>
-          </Card.Header>
-          <Card.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Ad Soyad</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="name"
-                  value={modalCustomer.name}
-                  onChange={handleModalChange}
-                  required
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Telefon</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="phoneNumber"
-                  value={modalCustomer.phoneNumber}
-                  onChange={handleModalChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>E-posta</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  value={modalCustomer.email}
-                  onChange={handleModalChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Adres</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  name="address"
-                  value={modalCustomer.address}
-                  onChange={handleModalChange}
-                  rows={4}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Not</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  name="note"
-                  value={modalCustomer.note}
-                  onChange={handleModalChange}
-                  rows={2}
-                />
-              </Form.Group>
-            </Form>
-          </Card.Body>
-          <Card.Footer className="d-flex justify-content-end gap-2">
-            <Button variant="secondary" onClick={handleCloseModal}>
-              Vazgeç
-            </Button>
-            <Button variant="primary" onClick={handleSave} disabled={loading}>
-              {loading ? <Spinner animation="border" size="sm" /> : "Kaydet"}
-            </Button>
-          </Card.Footer>
-        </Card>
-      </Modal>
+      <CustomerDetailModal
+        show={showDetail}
+        customer={detailCustomer}
+        onClose={handleCloseDetail}
+      />
 
-      {/* Detail Modal */}
-      <Modal show={showDetail} onHide={handleCloseDetail} centered>
-        <Card className="shadow-sm m-0">
-          <Card.Header>
-            <h5 className="mb-0">
-              <FontAwesomeIcon icon={faInfoCircle} className="me-2" />
-              Müşteri Detayı
-            </h5>
-          </Card.Header>
-          <Card.Body>
-            {detailCustomer && (
-              <div>
-                <Row className="mb-2">
-                  <Col xs={4} className="fw-bold">Ad Soyad:</Col>
-                  <Col xs={8}>{detailCustomer.name}</Col>
-                </Row>
-                <Row className="mb-2">
-                  <Col xs={4} className="fw-bold">Telefon:</Col>
-                  <Col xs={8}>{detailCustomer.phoneNumber}</Col>
-                </Row>
-                <Row className="mb-2">
-                  <Col xs={4} className="fw-bold">E-posta:</Col>
-                  <Col xs={8}>{detailCustomer.email}</Col>
-                </Row>
-                <Row className="mb-2">
-                  <Col xs={4} className="fw-bold">Adres:</Col>
-                  <Col xs={8}>{detailCustomer.address}</Col>
-                </Row>
-                <Row className="mb-2">
-                  <Col xs={4} className="fw-bold">Not:</Col>
-                  <Col xs={8}>{detailCustomer.note}</Col>
-                </Row>
-              </div>
-            )}
-          </Card.Body>
-          <Card.Footer className="d-flex justify-content-end">
-            <Button variant="secondary" onClick={handleCloseDetail}>
-              Kapat
-            </Button>
-          </Card.Footer>
-        </Card>
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <Modal show={showDelete} onHide={() => setShowDelete(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Müşteri Sil</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Bu müşteriyi silmek istediğinize emin misiniz?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDelete(false)}>
-            Vazgeç
-          </Button>
-          <Button variant="danger" onClick={confirmDelete} disabled={loading}>
-            {loading ? <Spinner animation="border" size="sm" /> : "Sil"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <DeleteCustomerModal
+        show={showDelete}
+        loading={loading}
+        onClose={() => setShowDelete(false)}
+        onConfirm={confirmDelete}
+      />
     </Container>
   );
 };

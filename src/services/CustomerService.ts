@@ -1,6 +1,10 @@
 import axios from "axios";
-import CustomerDTO from './CustomerDTO';
+import CustomerDTO from '../dtos/CustomerDTO';
+import dotenv from "dotenv";
 
+
+dotenv.config(); 
+//const API_URL = "http://localhost:8080/api/v1/";
 const API_URL = "http://137.184.83.58:8080/api/v1/";
 const CUSTOMER_URL = `${API_URL}customer`;
 
@@ -9,10 +13,9 @@ const axiosInstance = axios.create({
     baseURL: API_URL,
 });
 
-// Add a request interceptor to include the Bearer token
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("accessToken"); // Adjust this to where you store your token
+        const token = localStorage.getItem("accessToken"); 
         if (token) {
             if (!config.headers) {
                 config.headers = {};
@@ -43,7 +46,6 @@ class CustomerService {
                 customer.phoneNumber,
                 customer.email,
                 customer.address,
-                customer.communicationPreference,
                 customer.note,
                 customer.created_date,
                 customer.updated_date
@@ -65,7 +67,6 @@ class CustomerService {
                 customer.phoneNumber,
                 customer.email,
                 customer.address,
-                customer.communicationPreference,
                 customer.note,
                 customer.created_date,
                 customer.updated_date
@@ -127,7 +128,6 @@ class CustomerService {
                 customer.phoneNumber,
                 customer.email,
                 customer.address,
-                customer.communicationPreference,
                 customer.note,
                 customer.created_date,
                 customer.updated_date

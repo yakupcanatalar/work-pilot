@@ -7,7 +7,6 @@ interface Task {
 }
 
 interface TaskStageDto {
-  // Define fields as needed, e.g.:
   id: number;
   name: string;
 }

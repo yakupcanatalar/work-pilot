@@ -7,9 +7,9 @@ import { LoginData } from "../types/LoginData";
 
 // ---------- API URLS ----------
 const API_URL = "http://137.184.83.58:8080/api/v1/";
+//const API_URL = "http://localhost:8080/api/v1/";
 const AUTH_URL = `${API_URL}auth`;
 
-// ---------- Axios Instance with Bearer Token ----------
 const axiosInstance = axios.create({
   baseURL: API_URL,
 });

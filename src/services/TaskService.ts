@@ -1,6 +1,8 @@
 import axios from "axios";
 
 const API_URL = "http://137.184.83.58:8080/api/v1/";
+//const API_URL = "http://localhost:8080/api/v1/";
+
 const TASK_URL = `${API_URL}task`;
 
 // Create an Axios instance
