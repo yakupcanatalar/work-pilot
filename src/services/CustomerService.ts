@@ -1,9 +1,6 @@
 import axios from "axios";
 import CustomerDTO from '../dtos/CustomerDTO';
-import dotenv from "dotenv";
 
-
-dotenv.config(); 
 //const API_URL = "http://localhost:8080/api/v1/";
 const API_URL = "http://137.184.83.58:8080/api/v1/";
 const CUSTOMER_URL = `${API_URL}customer`;
