@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Card, Button, Spinner, Container } from 'react-bootstrap';
 import PageHeader from '../../components/PageHeader';
-import { faTasks } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag } from '@fortawesome/free-solid-svg-icons';
 
 interface Task {
   id: number;
@@ -27,10 +27,10 @@ const TaskPage: React.FC = () => {
 
   return (
             <Container className="py-4">
-      <PageHeader title="Görevler" icon={faTasks} />
+      <PageHeader title="Siparişler" icon={faShoppingBag} />
     <Card className="shadow-sm">
       <Card.Header>
-        <h5 className="mb-0">Görevler</h5>
+        <h5 className="mb-0">Siparişler</h5>
       </Card.Header>
       <Card.Body>
         {loading ? (

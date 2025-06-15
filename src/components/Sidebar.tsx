@@ -6,7 +6,7 @@ import {
   faTachometerAlt,
   faUsers,
   faProjectDiagram,
-  faTasks,
+  faShoppingBag,
   faChartBar,
   faAngleLeft,
   faAngleRight,
@@ -62,9 +62,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
           <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />
           {!collapsed && 'İş Akışları'}
         </Nav.Link>
-        <Nav.Link as={Link} to="/admin/task" className="mb-2 rounded" title="Görevler">
-          <FontAwesomeIcon icon={faTasks} className="me-2" />
-          {!collapsed && 'Görevler'}
+        <Nav.Link as={Link} to="/admin/task" className="mb-2 rounded" title="Siparişler">
+          <FontAwesomeIcon icon={faShoppingBag} className="me-2" />
+          {!collapsed && 'Siparişler'}
         </Nav.Link>
         <Nav.Link as={Link} to="/admin/statistics" className="mb-2 rounded" title="İstatistikler">
           <FontAwesomeIcon icon={faChartBar} className="me-2" />

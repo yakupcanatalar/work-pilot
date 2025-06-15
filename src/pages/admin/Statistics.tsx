@@ -66,7 +66,7 @@ const StatisticsPage: React.FC = () => {
               <Col md={6}>
                 <Card className="text-center border-success">
                   <Card.Body>
-                    <h6>Tamamlanan Görevler</h6>
+                    <h6>Tamamlanan Siparişler</h6>
                     <h3 className="text-success">{stats.completedTasks}</h3>
                   </Card.Body>
                 </Card>
@@ -74,7 +74,7 @@ const StatisticsPage: React.FC = () => {
               <Col md={6}>
                 <Card className="text-center border-warning">
                   <Card.Body>
-                    <h6>Bekleyen Görevler</h6>
+                    <h6>Bekleyen Siparişler</h6>
                     <h3 className="text-warning">{stats.pendingTasks}</h3>
                   </Card.Body>
                 </Card>

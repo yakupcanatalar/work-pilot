@@ -1,4 +1,4 @@
-import { faUsers, faEdit, faTrash, faUser, faInfoCircle, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faEdit, faTrash, faUser, faInfoCircle, faChevronLeft, faChevronRight, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
 import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,6 +8,7 @@ import CustomerDto from '../../dtos/CustomerDto';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
 import CustomerDetailModal from '../../components/modals/CustomerDetailModal';
 import DeleteCustomerModal from '../../components/modals/DeleteCustomerModal';
+import OrderModal from '../../components/modals/OrderModal';
 
 const CUSTOMER_NAME_MAX_LENGTH = 100;
 const CUSTOMER_NAME_MIN_LENGTH = 2;
@@ -43,6 +44,10 @@ const CustomerPage: React.FC = () => {
     address?: string;
     note?: string;
   }>({});
+
+  // Order Modal states
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderCustomer, setOrderCustomer] = useState<CustomerDto | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -199,6 +204,23 @@ const CustomerPage: React.FC = () => {
     setDetailCustomer(null);
   };
 
+  // Order Modal handlers
+  const handleShowOrderModal = (customer: CustomerDto) => {
+    setOrderCustomer(customer);
+    setShowOrderModal(true);
+  };
+
+  const handleCloseOrderModal = () => {
+    setShowOrderModal(false);
+    setOrderCustomer(null);
+  };
+
+  const handleOrderCreated = () => {
+    // Sipariş oluşturulduktan sonra yapılacak işlemler
+    // Örneğin: bildirim gösterme, sayfa yenileme vb.
+    console.log('Sipariş başarıyla oluşturuldu!');
+  };
+
   const totalPages = Math.ceil(filteredCustomers.length / pageSize);
 
   const paginatedCustomers = filteredCustomers.slice(
@@ -312,6 +334,15 @@ const CustomerPage: React.FC = () => {
                           <td>
                             <div className="d-flex gap-1 justify-content-center">
                               <Button
+                                variant="outline-success"
+                                size="sm"
+                                onClick={() => handleShowOrderModal(customer)}
+                                title="Yeni Sipariş"
+                                disabled={loading}
+                              >
+                                <FontAwesomeIcon icon={faShoppingCart} />
+                              </Button>
+                              <Button
                                 variant="outline-info"
                                 size="sm"
                                 onClick={() => handleShowDetail(customer)}
@@ -377,6 +408,7 @@ const CustomerPage: React.FC = () => {
           )}
         </Col>
       </Row>
+      
       <AddEditCustomerModal
         show={showModal}
         isEdit={isEdit}
@@ -399,6 +431,13 @@ const CustomerPage: React.FC = () => {
         loading={loading}
         onClose={() => setShowDelete(false)}
         onConfirm={confirmDelete}
+      />
+
+      <OrderModal
+        show={showOrderModal}
+        customer={orderCustomer}
+        onClose={handleCloseOrderModal}
+        onOrderCreated={handleOrderCreated}
       />
     </Container>
   );

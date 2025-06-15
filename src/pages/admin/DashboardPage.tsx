@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Container, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
-  faTasks,
+  faShoppingBag,
   faProjectDiagram,
   faChartLine,
   faTachometerAlt,
-  faUser
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import PageHeader from '../../components/PageHeader';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
-import FlowBuilder from '../admin/FlowBuilder'; // FlowBuilder'ı import ediyoruz
+import FlowBuilder from '../admin/FlowBuilder';
 import CustomerDto from '../../dtos/CustomerDto';
 import CustomerService from '../../services/CustomerService';
 import TaskStageDto from '../../dtos/TaskStageDto';
-import { createTask } from '../../services/TaskService'; // API çağrısı için import
+import { createTask, getTasks } from '../../services/TaskService';
 
 const emptyCustomer: CustomerDto = {
   id: 0,
@@ -26,22 +26,76 @@ const emptyCustomer: CustomerDto = {
   note: '',
 };
 
+interface DashboardStats {
+  totalCustomers: number;
+  activeTasks: number;
+  workflows: number;
+  productivity: string;
+}
+
 const DashboardPage: React.FC = () => {
-  const stats = [
-    { title: 'Total Customers', value: '1,254', icon: faUsers, color: 'primary' },
-    { title: 'Active Tasks', value: '42', icon: faTasks, color: 'success' },
-    { title: 'Workflows', value: '18', icon: faProjectDiagram, color: 'info' },
-    { title: 'Productivity', value: '87%', icon: faChartLine, color: 'warning' }
-  ];
+  const [stats, setStats] = useState<DashboardStats>({
+    totalCustomers: 0,
+    activeTasks: 0,
+    workflows: 0,
+    productivity: '0%'
+  });
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalCustomer, setModalCustomer] = useState<CustomerDto>(emptyCustomer);
   const [loading, setLoading] = useState(false);
-
   const [showFlowBuilder, setShowFlowBuilder] = useState(false);
-  
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+
+  useEffect(() => {
+    const loadDashboardStats = async () => {
+      try {
+        const customers = await CustomerService.getAllCustomers();
+        const totalCustomers = customers.length;
+
+        const tasks = await getTasks();
+        const workflows = tasks.length;
+
+        setStats(prev => ({
+          ...prev,
+          totalCustomers,
+          workflows
+        }));
+      } catch (error) {
+        console.error('Dashboard istatistikleri yüklenirken hata:', error);
+      }
+    };
+
+    loadDashboardStats();
+  }, []);
+
+  const dashboardCards = [
+    { 
+      title: 'Toplam Aktif Müşteri', 
+      value: stats.totalCustomers.toLocaleString(), 
+      icon: faUsers, 
+      color: 'primary' 
+    },
+    { 
+      title: 'Toplam Aktif Sipariş Sayısı', 
+      value: stats.activeTasks.toString(), 
+      icon: faShoppingBag, 
+      color: 'success' 
+    },
+    { 
+      title: 'Toplam Aktif İş Akışı', 
+      value: stats.workflows.toString(), 
+      icon: faProjectDiagram, 
+      color: 'info' 
+    },
+    { 
+      title: 'Üretkenlik Oranı', 
+      value: stats.productivity, 
+      icon: faChartLine, 
+      color: 'warning' 
+    }
+  ];
 
   const handleShowAddModal = () => {
     setModalCustomer(emptyCustomer);
@@ -67,6 +121,12 @@ const DashboardPage: React.FC = () => {
       await CustomerService.createCustomer(modalCustomer);
       setShowAddModal(false);
       setModalCustomer(emptyCustomer);
+      
+      const customers = await CustomerService.getAllCustomers();
+      setStats(prev => ({
+        ...prev,
+        totalCustomers: customers.length
+      }));
     } catch (err) {
       console.error('Error saving customer:', err);
     }
@@ -96,8 +156,13 @@ const DashboardPage: React.FC = () => {
       await createTask(taskData);
       setSuccess('İş akışı başarıyla oluşturuldu!');
       
-      // Modal'ı kapat
       setShowFlowBuilder(false);
+      
+      const tasks = await getTasks();
+      setStats(prev => ({
+        ...prev,
+        workflows: tasks.length
+      }));
       
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
@@ -109,12 +174,23 @@ const DashboardPage: React.FC = () => {
 
   return (
     <Container className="py-4">
+      {error && (
+        <Alert variant="danger" dismissible onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert variant="success" dismissible onClose={() => setSuccess('')}>
+          {success}
+        </Alert>
+      )}
+
       <div>
         <PageHeader title="Dashboard" icon={faTachometerAlt} />
       </div>
 
       <Row className="mb-4">
-        {stats.map((stat, index) => (
+        {dashboardCards.map((stat, index) => (
           <Col key={index} md={3} sm={6} className="mb-3">
             <Card className={`stat-card bg-${stat.color}-light`}>
               <Card.Body>
@@ -156,7 +232,7 @@ const DashboardPage: React.FC = () => {
                 Yeni Müşteri
               </button>
               <button className="btn btn-success mb-2 w-100">
-                <FontAwesomeIcon icon={faTasks} className="me-2" />
+                <FontAwesomeIcon icon={faShoppingBag} className="me-2" />
                 Yeni Görev
               </button>
               <button 
