@@ -1,8 +1,8 @@
 import axios from "axios";
 import TaskStageDto, { TaskStageStatus } from "../dtos/TaskStageDto";
 
-//const API_URL = "http://137.184.83.58:8080/api/v1/";
-const API_URL = "http://localhost:8080/api/v1/";
+const API_URL = "http://137.184.83.58:8080/api/v1/";
+//const API_URL = "http://localhost:8080/api/v1/";
 
 const TASK_STAGE_URL = `${API_URL}task-stage`;
 

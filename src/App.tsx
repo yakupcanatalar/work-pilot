@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, Outlet } from "react-router-dom";
 import Navigation from "./components/Navigation";
-import Container from "react-bootstrap/Container";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
@@ -12,9 +11,9 @@ import DashboardPage from "./pages/admin/DashboardPage";
 import ProfilePage from "./pages/admin/ProfilePage";
 import CustomerPage from "./pages/admin/Customer";
 import StatisticsPage from "./pages/admin/Statistics";
-import TaskPage from "./pages/admin/Task";
 import WorkflowPage from "./pages/admin/Workflow";
 import SettingsPage from "./pages/Settings";
+import OrderPage from "./pages/admin/Order";
 
 // PrivateRoute component to protect admin routes
 const PrivateRoute: React.FC = () => {
@@ -39,7 +38,7 @@ const AppContent: React.FC = () => {
               <Route path="profile" element={<ProfilePage />} />
               <Route path="customer" element={<CustomerPage />} />
               <Route path="statistics" element={<StatisticsPage />} />
-              {/* //<Route path="task" element={<OrderPage />} /> */}
+              <Route path="task" element={<OrderPage />} />
               <Route path="work-flow" element={<WorkflowPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
