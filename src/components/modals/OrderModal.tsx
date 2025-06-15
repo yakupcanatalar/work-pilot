@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faUser, faTasks, faCheckCircle, faList, faPhone, faEnvelope, faCircle, faMapMarkerAlt, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 import { getTasks } from '../../services/TaskService';
 import { searchOrders, createOrder } from '../../services/OrderService';
-import CustomerDto from '../../dtos/CustomerDto';
 import { OrderDetail, OrderSearchRequest, OrderStatus, CreateOrderRequest } from '../../dtos/OrderDto';
 import { faFirstOrder } from '@fortawesome/free-brands-svg-icons';
+import CustomerDto from '../../dtos/CustomerDto';
 
 interface Task {
   id: number;

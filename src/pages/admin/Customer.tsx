@@ -4,11 +4,11 @@ import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner } f
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import CustomerService from '../../services/CustomerService';
-import CustomerDto from '../../dtos/CustomerDto';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
 import CustomerDetailModal from '../../components/modals/CustomerDetailModal';
 import DeleteCustomerModal from '../../components/modals/DeleteCustomerModal';
 import OrderModal from '../../components/modals/OrderModal';
+import CustomerDto from '../../dtos/CustomerDto';
 
 const CUSTOMER_NAME_MAX_LENGTH = 100;
 const CUSTOMER_NAME_MIN_LENGTH = 2;

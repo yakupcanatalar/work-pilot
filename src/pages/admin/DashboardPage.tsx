@@ -12,10 +12,10 @@ import {
 import PageHeader from '../../components/PageHeader';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
 import FlowBuilder from '../admin/FlowBuilder';
-import CustomerDto from '../../dtos/CustomerDto';
 import CustomerService from '../../services/CustomerService';
 import TaskStageDto from '../../dtos/TaskStageDto';
 import { createTask, getTasks } from '../../services/TaskService';
+import CustomerDto from '../../dtos/CustomerDto';
 
 const emptyCustomer: CustomerDto = {
   id: 0,

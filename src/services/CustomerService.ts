@@ -1,5 +1,5 @@
 import axios from "axios";
-import CustomerDto from '../dtos/CustomerDto';
+import CustomerDto from "../dtos/CustomerDto";
 
 //const API_URL = "http://localhost:8080/api/v1/";
 const API_URL = "http://137.184.83.58:8080/api/v1/";
