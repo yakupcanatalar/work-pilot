@@ -43,7 +43,6 @@ const WorkflowPage: React.FC = () => {
     setLoading(false);
   };
 
-  // Sadece ACTIVE durumundaki stage'leri filtrele
   const getActiveStages = (stages: TaskStageDto[] | undefined): TaskStageDto[] => {
     if (!stages) return [];
     return stages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
