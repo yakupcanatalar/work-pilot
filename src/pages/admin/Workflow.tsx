@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import { getTasks, createTask, updateTaskById, deleteTaskById } from '../../services/TaskService';
 import FlowBuilder from './FlowBuilder';
+import StageFlow from '../../components/StageFlow'; // StageFlow komponentini import et
 import '../../assets/styles/flow.css';
 import TaskDto from '../../dtos/TaskDto';
 import TaskStageDto, { TaskStageStatus } from '../../dtos/TaskStageDto';
@@ -419,30 +420,9 @@ const WorkflowPage: React.FC = () => {
                 </table>
 
                 <p><strong>Aşamalar:</strong></p>
-                {(() => {
-                  const activeStages = getActiveStages(detailTask.stages);
-                  return activeStages.length > 0 ? (
-                    <div className="stage-flow">
-                      {activeStages.map((stage, index) => (
-                        <React.Fragment key={stage.id}>
-                          <div className="stage-box">
-                            {stage.name}
-                            {stage.note && (
-                              <div className="stage-note text-muted small">
-                                {stage.note}
-                              </div>
-                            )}
-                          </div>
-                          {index !== activeStages.length - 1 && (
-                            <div className="arrow">→</div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted">Aktif aşama bulunmamaktadır.</p>
-                  );
-                })()}
+                <StageFlow 
+                  stages={getActiveStages(detailTask.stages)} 
+                />
               </>
             )}
           </Card.Body>

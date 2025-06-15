@@ -15,6 +15,8 @@ import {
 } from '../../services/OrderService';
 import { OrderSearchRequest, Order, OrderDetail, OrderStatus } from '../../dtos/OrderDto';
 import '../../assets/styles/flow.css';
+import StageFlow from '../../components/StageFlow';
+import { getTaskById } from '../../services/TaskService';
 
 
 interface ExtendedOrder extends Order {
@@ -178,18 +180,22 @@ const OrderPage: React.FC = () => {
     setActionLoading(null);
   };
 
-  const handleShowDetail = async (order: ExtendedOrder) => {
-    setLoading(true);
-    try {
-      const orderDetail = await getOrderById(order.id);
-      setDetailOrder(orderDetail);
-      setShowDetail(true);
-    } catch (err) {
-      console.error('Error fetching order detail:', err);
-      setError('Sipariş detayları yüklenirken hata oluştu.');
-    }
-    setLoading(false);
-  };
+const handleShowDetail = async (order: ExtendedOrder) => {
+  setLoading(true);
+  try {
+    const orderDetail = await getOrderById(order.id);
+    setDetailOrder(orderDetail);
+
+const taskDetail = await getTaskById(orderDetail.task.id) as { stages?: any[] };
+orderDetail.taskStages = taskDetail.stages || [];
+
+    setShowDetail(true);
+  } catch (err) {
+    console.error('Error fetching order detail:', err);
+    setError('Sipariş detayları yüklenirken hata oluştu.');
+  }
+  setLoading(false);
+};
 
   const handleCloseDetail = () => {
     setShowDetail(false);
@@ -661,7 +667,6 @@ const OrderPage: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Detail Modal */}
       <Modal show={showDetail} onHide={handleCloseDetail} centered size="lg">
         <Card className="shadow-sm m-0">
           <Card.Header>
@@ -734,6 +739,10 @@ const OrderPage: React.FC = () => {
                     </div>
                   )}
                 </div>
+                <StageFlow
+                  stages={detailOrder.taskStages}
+                  currentStageId={detailOrder.currentTaskStage?.id}
+                ></StageFlow>
               </>
             )}
           </Card.Body>

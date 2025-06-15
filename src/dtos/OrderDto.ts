@@ -1,3 +1,5 @@
+import TaskStageDto from "./TaskStageDto";
+
 export interface CreateOrderRequest {
   customerId: number;
   taskId: number;
@@ -45,6 +47,7 @@ export interface OrderDetail {
   hasNextStage: boolean;
   createdDate: number;
   updatedDate: number;
+  taskStages: TaskStageDto[];
 }
 
 export interface Order {

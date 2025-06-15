@@ -46,3 +46,86 @@
   color: #0d6efd; /* Bootstrap'in mavi tonu */
   text-decoration: underline;
 }
+
+/* StageFlow.css */
+.stage-flow-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0;
+}
+
+.stage-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 80px;
+  height: 50px;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  padding: 5px;
+  transition: all 0.3s ease;
+}
+
+.stage-name {
+  text-align: center;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+/* Stage states */
+.past-stage {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.current-stage {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.future-stage {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+}
+
+.completed-stage {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+/* Arrow states */
+.past-arrow {
+  color: #28a745;
+}
+
+.current-arrow {
+  color: #ffc107;
+}
+
+.future-arrow {
+  color: #6c757d;
+}
+
+.completed-arrow {
+  color: #28a745;
+}
