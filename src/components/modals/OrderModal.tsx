@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Card, Button, Form, Spinner, Alert, Nav, Tab, Table, Row, Col, Badge } from 'react-bootstrap';
+import { Modal, Card, Button, Form, Spinner, Alert, Nav, Tab, Table, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faUser, faTasks, faCheckCircle, faList, faPhone, faEnvelope, faCircle, faMapMarkerAlt, faStickyNote } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faCheckCircle, faList, faPhone, faEnvelope, faCircle, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { getTasks } from '../../services/TaskService';
 import { searchOrders, createOrder } from '../../services/OrderService';
 import { OrderDetail, OrderSearchRequest, OrderStatus, CreateOrderRequest } from '../../dtos/OrderDto';
-import { faFirstOrder } from '@fortawesome/free-brands-svg-icons';
 import CustomerDto from '../../dtos/CustomerDto';
 
 interface Task {
