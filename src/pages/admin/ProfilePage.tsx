@@ -4,6 +4,8 @@ import { faSave, faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import { useProfileService } from '../../services/ProfileService';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 interface ProfileState {
   firstname: string;
@@ -52,7 +54,7 @@ const Profile: React.FC = () => {
       } catch (error: any) {
         setAlert({
           type: 'danger',
-          message: error?.message || 'Profil bilgileri yüklenirken hata oluştu'
+          message: ErrorMessage.get(error)
         });
       } finally {
         setLoading(false);
@@ -91,7 +93,7 @@ const Profile: React.FC = () => {
     } catch (error: any) {
       setAlert({
         type: 'danger',
-        message: error?.message || 'Profil güncellenirken hata oluştu'
+         message: ErrorMessage.get(error)
       });
     } finally {
       setProfileUpdateLoading(false);
@@ -131,7 +133,7 @@ const Profile: React.FC = () => {
     } catch (error: any) {
       setAlert({
         type: 'danger',
-        message: error?.message || 'Şifre değiştirilirken hata oluştu'
+         message: ErrorMessage.get(error)
       });
     } finally {
       setPasswordChangeLoading(false);

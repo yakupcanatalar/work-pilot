@@ -6,6 +6,7 @@ import '../assets/styles/login.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFish } from '@fortawesome/free-solid-svg-icons';
 import { useToken } from '../utils/TokenContext';
+import { ErrorMessage } from '../utils/ErrorMessage';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -35,8 +36,7 @@ const LoginPage: React.FC = () => {
       setRefreshToken(response.refresh_token);
       navigate('/admin');
     } catch (err: any) {
-      const message = err.response?.data?.message || 'Giriş sırasında bir hata oluştu';
-      setError(message);
+      setError(ErrorMessage.get(err));
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,8 @@ import CustomerDetailModal from '../../components/modals/CustomerDetailModal';
 import DeleteCustomerModal from '../../components/modals/DeleteCustomerModal';
 import OrderModal from '../../components/modals/OrderModal';
 import CustomerDto from '../../dtos/CustomerDto';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 const CUSTOMER_NAME_MAX_LENGTH = 100;
 const CUSTOMER_NAME_MIN_LENGTH = 2;
@@ -61,7 +63,6 @@ const CustomerPage: React.FC = () => {
 
   useEffect(() => {
     fetchCustomers();
-    // eslint-disable-next-line
   }, []);
 
   const fetchCustomers = async () => {
@@ -71,6 +72,7 @@ const CustomerPage: React.FC = () => {
       setCustomers(data);
     } catch (err) {
       console.error('Error fetching customers:', err);
+      alert(ErrorMessage.get(err)); // veya setError(ErrorMessage.get(err)) ile ekranda gösterebilirsin
     }
     setLoading(false);
   };
@@ -190,7 +192,8 @@ const CustomerPage: React.FC = () => {
         await deleteCustomer(deleteId);
         await fetchCustomers();
       } catch (err) {
-        // handle error
+      console.error('Error saving customer:', err);
+      alert(ErrorMessage.get(err));
       }
       setShowDelete(false);
       setDeleteId(null);

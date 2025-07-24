@@ -16,6 +16,8 @@ import { useCustomerService } from '../../services/CustomerService';
 import TaskStageDto from '../../dtos/TaskStageDto';
 import { useTaskService } from '../../services/TaskService';
 import CustomerDto from '../../dtos/CustomerDto';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 const emptyCustomer: CustomerDto = {
   id: 0,
@@ -48,7 +50,6 @@ const DashboardPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
-  // Yeni servis hooklarını kullan
   const {
     getAllCustomers,
     createCustomer,
@@ -70,7 +71,8 @@ const DashboardPage: React.FC = () => {
           workflows
         }));
       } catch (error) {
-        console.error('Dashboard istatistikleri yüklenirken hata:', error);
+                console.error('Dashboard istatistikleri yüklenirken hata:', error);
+        setError(ErrorMessage.get(error));
       }
     };
 
@@ -136,7 +138,8 @@ const DashboardPage: React.FC = () => {
         totalCustomers: customers.length
       }));
     } catch (err) {
-      console.error('Error saving customer:', err);
+            console.error('Error saving customer:', err);
+      setError(ErrorMessage.get(err));
     }
     setLoading(false);
   };
@@ -175,7 +178,7 @@ const DashboardPage: React.FC = () => {
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error saving workflow:', error);
-      setError('İş akışı kaydedilirken hata oluştu!');
+      setError(ErrorMessage.get(error));
     }
     setLoading(false);
   };

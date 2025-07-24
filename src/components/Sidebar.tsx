@@ -7,7 +7,6 @@ import {
   faUsers,
   faProjectDiagram,
   faShoppingBag,
-  faChartBar,
   faAngleLeft,
   faAngleRight,
 } from '@fortawesome/free-solid-svg-icons';

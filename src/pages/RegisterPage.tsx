@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useUserService } from '../services/UserService';
 import { useToken } from '../utils/TokenContext';
 import '../assets/styles/login.css';
+import { ErrorMessage } from '../utils/ErrorMessage';
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -45,8 +46,7 @@ const RegisterPage: React.FC = () => {
       setRefreshToken(response.refresh_token);
       navigate('/admin');
     } catch (err: any) {
-      const message = err.response?.data?.message || 'Kayıt sırasında bir hata oluştu';
-      setError(message);
+      setError(ErrorMessage.get(err));
     } finally {
       setLoading(false);
     }

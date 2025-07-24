@@ -1,7 +1,6 @@
 import { OrderSearchRequest, PageResult, Order, OrderDetail, CreateOrderRequest, ActiveOrder } from "../dtos/OrderDto";
 import { useAxios } from "../utils/TokenService";
-
-// API_URL ve ORDER_URL artık useAxios içinde yönetilecek
+import { ErrorMessage } from "../utils/ErrorMessage";
 
 export const useOrderService = () => {
   const axiosInstance = useAxios();
@@ -10,48 +9,84 @@ export const useOrderService = () => {
   const searchOrders = async (
     searchRequest: OrderSearchRequest
   ): Promise<PageResult<Order, OrderDetail>> => {
-    const response = await axiosInstance.get<PageResult<Order, OrderDetail>>(
-      ORDER_URL,
-      { params: searchRequest }
-    );
-    return response.data;
+    try {
+      const response = await axiosInstance.get<PageResult<Order, OrderDetail>>(
+        ORDER_URL,
+        { params: searchRequest }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const createOrder = async (
     orderData: CreateOrderRequest
   ): Promise<void> => {
-    await axiosInstance.post(ORDER_URL, orderData);
+    try {
+      await axiosInstance.post(ORDER_URL, orderData);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const getOrderById = async (orderId: number): Promise<OrderDetail> => {
-    const response = await axiosInstance.get<OrderDetail>(
-      `${ORDER_URL}/${orderId}`
-    );
-    return response.data;
+    try {
+      const response = await axiosInstance.get<OrderDetail>(
+        `${ORDER_URL}/${orderId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const startOrder = async (orderId: number): Promise<void> => {
-    await axiosInstance.put(`${ORDER_URL}/${orderId}/start`);
+    try {
+      await axiosInstance.put(`${ORDER_URL}/${orderId}/start`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const cancelOrder = async (orderId: number): Promise<void> => {
-    await axiosInstance.delete(`${ORDER_URL}/${orderId}/cancel`);
+    try {
+      await axiosInstance.delete(`${ORDER_URL}/${orderId}/cancel`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const completeOrder = async (orderId: number): Promise<void> => {
-    await axiosInstance.put(`${ORDER_URL}/${orderId}/complete`);
+    try {
+      await axiosInstance.put(`${ORDER_URL}/${orderId}/complete`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const revertOrder = async (orderId: number): Promise<void> => {
-    await axiosInstance.put(`${ORDER_URL}/${orderId}/revert`);
+    try {
+      await axiosInstance.put(`${ORDER_URL}/${orderId}/revert`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const moveToNextStage = async (orderId: number): Promise<void> => {
-    await axiosInstance.put(`${ORDER_URL}/${orderId}/next-stage`);
+    try {
+      await axiosInstance.put(`${ORDER_URL}/${orderId}/next-stage`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const moveToPreviousStage = async (orderId: number): Promise<void> => {
-    await axiosInstance.put(`${ORDER_URL}/${orderId}/previous-stage`);
+    try {
+      await axiosInstance.put(`${ORDER_URL}/${orderId}/previous-stage`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   return {

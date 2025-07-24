@@ -6,6 +6,8 @@ import { useTaskService } from '../../services/TaskService';
 import { useOrderService } from '../../services/OrderService';
 import { OrderDetail, OrderSearchRequest, OrderStatus, CreateOrderRequest } from '../../dtos/OrderDto';
 import CustomerDto from '../../dtos/CustomerDto';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 interface Task {
   id: number;
@@ -63,7 +65,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
       setTasks(data);
     } catch (err) {
       console.error('Error fetching tasks:', err);
-      setError('Görevler yüklenirken hata oluştu.');
+      setError(ErrorMessage.get(err));
     }
     setLoading(false);
   };
@@ -87,7 +89,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
       setOrders(sortedOrders);
     } catch (err) {
       console.error('Error fetching orders:', err);
-      setOrdersError('Siparişler yüklenirken hata oluştu.');
+      setOrdersError(ErrorMessage.get(err));
     }
     setOrdersLoading(false);
   };
@@ -125,7 +127,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
       }
     } catch (err) {
       console.error('Error creating order:', err);
-      setError('Sipariş oluşturulurken hata oluştu.');
+      setError(ErrorMessage.get(err));
     } finally {
       setCreating(false);
     }
@@ -257,8 +259,8 @@ const OrderModal: React.FC<OrderModalProps> = ({
                           <div
                             key={task.id}
                             className={`p-3 ${index < tasks.length - 1 ? 'border-bottom' : ''} ${selectedTaskId === task.id
-                                ? 'bg-primary bg-opacity-10'
-                                : 'bg-white'
+                              ? 'bg-primary bg-opacity-10'
+                              : 'bg-white'
                               }`}
                             style={{ cursor: 'pointer' }}
                             onClick={() => handleTaskSelect(task.id)}

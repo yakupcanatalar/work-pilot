@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Row, Col, Spinner, Container } from 'react-bootstrap';
 import PageHeader from '../../components/PageHeader';
-import { faChartBar, faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
+import { faChartBar } from '@fortawesome/free-solid-svg-icons';
 
 interface StatisticsData {
   totalCustomers: number;

@@ -15,6 +15,8 @@ import { useTaskStageService } from '../../services/TaskStage';
 import '../../assets/styles/flow.css';
 import TaskStageDto from '../../dtos/TaskStageDto';
 import TaskDto from '../../dtos/TaskDto';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 interface FlowBuilderProps {
   show: boolean;
@@ -65,6 +67,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
       setAvailableStages(stages);
     } catch (error) {
       console.error('Error loading task stages:', error);
+      alert(ErrorMessage.get(error));
     }
   };
 
@@ -227,7 +230,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
       await loadTaskStages();
     } catch (error) {
       console.error('Error creating stage:', error);
-      alert('Aşama oluşturulurken hata oluştu!');
+      alert(ErrorMessage.get(error));
     }
     setLoading(false);
   };
@@ -248,7 +251,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
         });
       } catch (error) {
         console.error('Error deleting stage:', error);
-        alert('Aşama silinirken hata oluştu!');
+        alert(ErrorMessage.get(error));
       }
       setLoading(false);
     }
@@ -277,7 +280,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
       });
     } catch (error) {
       console.error('Error saving workflow:', error);
-      alert('İş akışı kaydedilirken hata oluştu!');
+      alert(ErrorMessage.get(error));
     }
     setLoading(false);
   };

@@ -16,7 +16,6 @@ const SettingsPage: React.FC = () => {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // Save logic here (API call, localStorage, etc.)
     alert('Ayarlar kaydedildi!');
   };
 

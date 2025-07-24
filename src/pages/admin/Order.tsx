@@ -8,6 +8,8 @@ import { OrderSearchRequest, Order, OrderDetail, OrderStatus } from '../../dtos/
 import '../../assets/styles/flow.css';
 import StageFlow from '../../components/StageFlow';
 import { useTaskService } from '../../services/TaskService';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 interface ExtendedOrder extends Order {
   customerName?: string;
@@ -56,7 +58,6 @@ const OrderPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line
   }, [currentPage]);
 
   const fetchOrders = async () => {
@@ -89,7 +90,7 @@ const OrderPage: React.FC = () => {
       setTotalPages(result.totalPages || 1);
     } catch (err) {
       console.error('Error fetching orders:', err);
-      setError('Siparişler yüklenirken hata oluştu.');
+      setError(ErrorMessage.get(err));
     }
     setLoading(false);
   };
@@ -178,7 +179,7 @@ const OrderPage: React.FC = () => {
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error(`Error ${action} order:`, err);
-      setError(`Sipariş ${action} işlemi sırasında hata oluştu!`);
+      setError(ErrorMessage.get(err));
     }
     setActionLoading(null);
   };
@@ -195,7 +196,7 @@ const OrderPage: React.FC = () => {
       setShowDetail(true);
     } catch (err) {
       console.error('Error fetching order detail:', err);
-      setError('Sipariş detayları yüklenirken hata oluştu.');
+      setError(ErrorMessage.get(err));
     }
     setLoading(false);
   };

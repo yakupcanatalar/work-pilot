@@ -9,6 +9,8 @@ import StageFlow from '../../components/StageFlow';
 import '../../assets/styles/flow.css';
 import TaskDto from '../../dtos/TaskDto';
 import TaskStageDto, { TaskStageStatus } from '../../dtos/TaskStageDto';
+import { ErrorMessage } from '../../utils/ErrorMessage';
+
 
 const WorkflowPage: React.FC = () => {
   const {
@@ -45,7 +47,7 @@ const WorkflowPage: React.FC = () => {
       setTasks(data);
     } catch (err) {
       console.error('Error fetching tasks:', err);
-      setError('İş akışları yüklenirken hata oluştu.');
+      setError(ErrorMessage.get(err));
     }
     setLoading(false);
   };
@@ -113,7 +115,7 @@ const WorkflowPage: React.FC = () => {
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error saving flow:', error);
-      setError('İş akışı kaydedilirken hata oluştu!');
+      setError(ErrorMessage.get(error));
     }
     setLoading(false);
   };
@@ -135,7 +137,8 @@ const WorkflowPage: React.FC = () => {
         setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
         console.error('Error deleting task:', err);
-        setError('İş akışı silinirken hata oluştu!');
+        setError(ErrorMessage.get(error));
+
       }
       setShowDelete(false);
       setDeleteId(null);

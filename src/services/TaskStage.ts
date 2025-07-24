@@ -1,5 +1,6 @@
 import TaskStageDto, { TaskStageStatus } from "../dtos/TaskStageDto";
 import { useAxios } from "../utils/TokenService";
+import { ErrorMessage } from "../utils/ErrorMessage";
 
 export const TaskStageRequestValidator = {
   TASK_STAGE_NAME_MIN_LENGTH: 3,
@@ -13,14 +14,22 @@ export const useTaskStageService = () => {
   const axiosInstance = useAxios();
 
   const getAllTaskStages = async (): Promise<TaskStageDto[]> => {
-    const response = await axiosInstance.get(TASK_STAGE_URL);
-    const allStages = response.data as TaskStageDto[];
-    return allStages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
+    try {
+      const response = await axiosInstance.get(TASK_STAGE_URL);
+      const allStages = response.data as TaskStageDto[];
+      return allStages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const getTaskStageById = async (id: number): Promise<TaskStageDto> => {
-    const response = await axiosInstance.get(`${TASK_STAGE_URL}/${id}`);
-    return response.data as TaskStageDto;
+    try {
+      const response = await axiosInstance.get(`${TASK_STAGE_URL}/${id}`);
+      return response.data as TaskStageDto;
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const createTaskStage = async (
@@ -29,13 +38,17 @@ export const useTaskStageService = () => {
       note?: string;
     }
   ): Promise<TaskStageDto> => {
-    const stageToCreate = {
-      name: stageData.name,
-      note: stageData.note,
-      status: TaskStageStatus.ACTIVE
-    };
-    const response = await axiosInstance.post(TASK_STAGE_URL, stageToCreate);
-    return response.data as TaskStageDto;
+    try {
+      const stageToCreate = {
+        name: stageData.name,
+        note: stageData.note,
+        status: TaskStageStatus.ACTIVE
+      };
+      const response = await axiosInstance.post(TASK_STAGE_URL, stageToCreate);
+      return response.data as TaskStageDto;
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const updateTaskStage = async (
@@ -45,31 +58,43 @@ export const useTaskStageService = () => {
       note?: string;
     }
   ): Promise<TaskStageDto> => {
-    const stageToUpdate = {
-      name: stageData.name,
-      note: stageData.note,
-      status: TaskStageStatus.ACTIVE // Güncelleme sırasında status ACTIVE kalır
-    };
-    const response = await axiosInstance.put(
-      `${TASK_STAGE_URL}/${id}`,
-      stageToUpdate
-    );
-    return response.data as TaskStageDto;
+    try {
+      const stageToUpdate = {
+        name: stageData.name,
+        note: stageData.note,
+        status: TaskStageStatus.ACTIVE // Güncelleme sırasında status ACTIVE kalır
+      };
+      const response = await axiosInstance.put(
+        `${TASK_STAGE_URL}/${id}`,
+        stageToUpdate
+      );
+      return response.data as TaskStageDto;
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const deleteTaskStage = async (id: number): Promise<void> => {
-    // Önce stage'i getir
-    const stage = await getTaskStageById(id);
-    const stageToUpdate = {
-      name: stage.name,
-      note: stage.note,
-      status: TaskStageStatus.DELETED
-    };
-    await axiosInstance.put(`${TASK_STAGE_URL}/${id}`, stageToUpdate);
+    try {
+      // Önce stage'i getir
+      const stage = await getTaskStageById(id);
+      const stageToUpdate = {
+        name: stage.name,
+        note: stage.note,
+        status: TaskStageStatus.DELETED
+      };
+      await axiosInstance.put(`${TASK_STAGE_URL}/${id}`, stageToUpdate);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   const hardDeleteTaskStage = async (id: number): Promise<void> => {
-    await axiosInstance.delete(`${TASK_STAGE_URL}/${id}`);
+    try {
+      await axiosInstance.delete(`${TASK_STAGE_URL}/${id}`);
+    } catch (error) {
+      throw new Error(ErrorMessage.get(error));
+    }
   };
 
   return {
@@ -79,5 +104,5 @@ export const useTaskStageService = () => {
     updateTaskStage,
     deleteTaskStage,
     hardDeleteTaskStage,
-    };
+  };
 };
