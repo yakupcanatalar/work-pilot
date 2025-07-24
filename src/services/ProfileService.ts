@@ -1,8 +1,7 @@
 // services/profileService.ts
 import axios from "axios";
 
-const API_URL = "http://137.184.83.58:8080/api/v1/";
-//const API_URL = "http://localhost:8080/api/v1/";
+const API_URL = process.env.REACT_APP_API_URL;
 const USER_URL = `${API_URL}users`;
 
 // Types matching your backend DTOs

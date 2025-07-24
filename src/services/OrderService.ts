@@ -1,9 +1,7 @@
 import axios from "axios";
 import { OrderSearchRequest, PageResult, Order, OrderDetail, CreateOrderRequest, ActiveOrder } from "../dtos/OrderDto";
 
-const API_URL = "http://137.184.83.58:8080/api/v1/";
-//const API_URL = "http://localhost:8080/api/v1/";
-
+const API_URL = process.env.REACT_APP_API_URL;
 const ORDER_URL = `${API_URL}order`;
 
 const axiosInstance = axios.create({
