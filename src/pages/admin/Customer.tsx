@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
-import CustomerService from '../../services/CustomerService';
+import { useCustomerService } from '../../services/CustomerService';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
 import CustomerDetailModal from '../../components/modals/CustomerDetailModal';
 import DeleteCustomerModal from '../../components/modals/DeleteCustomerModal';
@@ -27,6 +27,13 @@ const emptyCustomer: CustomerDto = {
 };
 
 const CustomerPage: React.FC = () => {
+  const {
+    getAllCustomers,
+    createCustomer,
+    updateCustomer,
+    deleteCustomer,
+  } = useCustomerService();
+
   const [customers, setCustomers] = useState<CustomerDto[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalCustomer, setModalCustomer] = useState<CustomerDto>(emptyCustomer);
@@ -54,12 +61,13 @@ const CustomerPage: React.FC = () => {
 
   useEffect(() => {
     fetchCustomers();
+    // eslint-disable-next-line
   }, []);
 
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const data = await CustomerService.getAllCustomers();
+      const data = await getAllCustomers();
       setCustomers(data);
     } catch (err) {
       console.error('Error fetching customers:', err);
@@ -158,9 +166,9 @@ const CustomerPage: React.FC = () => {
     setLoading(true);
     try {
       if (isEdit) {
-        await CustomerService.updateCustomer(modalCustomer.id ?? 0, modalCustomer);
+        await updateCustomer(modalCustomer.id ?? 0, modalCustomer);
       } else {
-        await CustomerService.createCustomer(modalCustomer);
+        await createCustomer(modalCustomer);
       }
       await fetchCustomers();
       handleCloseModal();
@@ -179,7 +187,7 @@ const CustomerPage: React.FC = () => {
     if (deleteId !== null) {
       setLoading(true);
       try {
-        await CustomerService.deleteCustomer(deleteId);
+        await deleteCustomer(deleteId);
         await fetchCustomers();
       } catch (err) {
         // handle error

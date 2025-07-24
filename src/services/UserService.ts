@@ -1,61 +1,35 @@
-// services/authService.ts
-import axios from "axios";
+import { useAxios } from "../utils/TokenService";
 import { UserData } from "../types/UserData";
 import { AuthResponse } from "../types/AuthResponse";
 import { LoginData } from "../types/LoginData";
 
-const API_URL = process.env.REACT_APP_API_URL;
-const AUTH_URL = `${API_URL}auth`;
+export const useUserService = () => {
+  const axiosInstance = useAxios();
 
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-});
-
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-export const registerUser = async (
-  userData: UserData
-): Promise<AuthResponse> => {
-  try {
+  const registerUser = async (userData: UserData): Promise<AuthResponse> => {
     const response = await axiosInstance.post<AuthResponse>(
-      `${AUTH_URL}/register`,
+      `/auth/register`,
       userData
     );
     return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      console.error("Register error:", error.response.data);
-      throw error.response.data;
-    }
-    throw error;
-  }
-};
+  };
 
-export const loginUser = async (userData: LoginData): Promise<AuthResponse> => {
-  const response = await axiosInstance.put<AuthResponse>(
-    `${AUTH_URL}/authenticate`,
-    userData
-  );
-  return response.data;
-};
+  const loginUser = async (userData: LoginData): Promise<AuthResponse> => {
+    const response = await axiosInstance.put<AuthResponse>(
+      `/auth/authenticate`,
+      userData
+    );
+    return response.data;
+  };
 
-export const logoutUser = async (): Promise<void> => {
-  await axiosInstance.post(`${AUTH_URL}/logout`);
-};
+  const logoutUser = async (): Promise<void> => {
+    await axiosInstance.post(`/auth/logout`);
+  };
 
-export const refreshToken = async (): Promise<AuthResponse> => {
-  const response = await axiosInstance.post<AuthResponse>(
-    `${AUTH_URL}/refresh`
-  );
-  return response.data;
+  const refreshToken = async (): Promise<AuthResponse> => {
+    const response = await axiosInstance.post<AuthResponse>(`/auth/refresh`);
+    return response.data;
+  };
+
+  return { registerUser, loginUser, logoutUser, refreshToken };
 };

@@ -1,46 +1,23 @@
-import axios from "axios";
+import { useAxios } from "../utils/TokenService";
 
-const API_URL = process.env.REACT_APP_API_URL;
-const TASK_URL = `${API_URL}task`;
+const TASK_URL = "/task";
 
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-});
+export const useTaskService = () => {
+  const axiosInstance = useAxios();
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where you store your token
-    if (token) {
-      if (!config.headers) {
-        config.headers = {};
-      }
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-export const createTask = async (taskData: { name: string; note: string; stageIds: number[] }) => {
-  try {
+  const createTask = async (taskData: { name: string; note: string; stageIds: number[] }) => {
     const response = await axiosInstance.post(TASK_URL, taskData);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const getTasks = async () => {
-  try {
+  const getTasks = async () => {
     const response = await axiosInstance.get(TASK_URL);
     const tasks = (response.data as any[]).map((task: any) => {
       let nodes;
       try {
         nodes = JSON.parse(task.note);
       } catch (e) {
-        nodes = task.note; // or handle the error as needed
+        nodes = task.note;
       }
       return {
         ...task,
@@ -48,34 +25,28 @@ export const getTasks = async () => {
       };
     });
     return tasks;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const getTaskById = async (taskId: number) => {
-  try {
+  const getTaskById = async (taskId: number) => {
     const response = await axiosInstance.get(`${TASK_URL}/${taskId}`);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const deleteTaskById = async (taskId: number) => {
-  try {
+  const deleteTaskById = async (taskId: number) => {
     const response = await axiosInstance.delete(`${TASK_URL}/${taskId}`);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const updateTaskById = async (taskId: number, taskData: { name: string; note: string; stageIds: number[] }) => {
-  try {
+  const updateTaskById = async (taskId: number, taskData: { name: string; note: string; stageIds: number[] }) => {
     const response = await axiosInstance.put(`${TASK_URL}/${taskId}`, taskData);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
+  };
+
+  return {
+    createTask,
+    getTasks,
+    getTaskById,
+    deleteTaskById,
+    updateTaskById,
+      };
 };

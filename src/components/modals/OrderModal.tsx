@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Card, Button, Form, Spinner, Alert, Nav, Tab, Table, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faCheckCircle, faList, faPhone, faEnvelope, faCircle, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-import { getTasks } from '../../services/TaskService';
-import { searchOrders, createOrder } from '../../services/OrderService';
+import { useTaskService } from '../../services/TaskService';
+import { useOrderService } from '../../services/OrderService';
 import { OrderDetail, OrderSearchRequest, OrderStatus, CreateOrderRequest } from '../../dtos/OrderDto';
 import CustomerDto from '../../dtos/CustomerDto';
 
@@ -40,6 +40,10 @@ const OrderModal: React.FC<OrderModalProps> = ({
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string>('');
 
+  // Yeni servis hooklarını kullan
+  const { getTasks } = useTaskService();
+  const { searchOrders, createOrder } = useOrderService();
+
   useEffect(() => {
     if (show) {
       if (activeTab === 'new-order') {
@@ -48,6 +52,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
         fetchOrders();
       }
     }
+    // eslint-disable-next-line
   }, [show, activeTab]);
 
   const fetchTasks = async () => {

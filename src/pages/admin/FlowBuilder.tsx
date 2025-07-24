@@ -11,7 +11,7 @@ import ReactFlow, {
   MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { getAllTaskStages, createTaskStage, deleteTaskStage } from '../../services/TaskStage';
+import { useTaskStageService } from '../../services/TaskStage';
 import '../../assets/styles/flow.css';
 import TaskStageDto from '../../dtos/TaskStageDto';
 import TaskDto from '../../dtos/TaskDto';
@@ -42,6 +42,12 @@ function getOrderedStageIds(nodes: Node[], edges: Edge[]): number[] {
 }
 
 const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task }) => {
+  const {
+    getAllTaskStages,
+    createTaskStage,
+    deleteTaskStage,
+  } = useTaskStageService();
+
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [newStageName, setNewStageName] = useState('');
@@ -115,6 +121,7 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
         setEdges([]);
       }
     }
+    // eslint-disable-next-line
   }, [task, show]);
 
   const onConnect = useCallback(

@@ -12,9 +12,9 @@ import {
 import PageHeader from '../../components/PageHeader';
 import AddEditCustomerModal from '../../components/modals/AddEditCustomerModal';
 import FlowBuilder from '../admin/FlowBuilder';
-import CustomerService from '../../services/CustomerService';
+import { useCustomerService } from '../../services/CustomerService';
 import TaskStageDto from '../../dtos/TaskStageDto';
-import { createTask, getTasks } from '../../services/TaskService';
+import { useTaskService } from '../../services/TaskService';
 import CustomerDto from '../../dtos/CustomerDto';
 
 const emptyCustomer: CustomerDto = {
@@ -48,10 +48,17 @@ const DashboardPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
+  // Yeni servis hooklarını kullan
+  const {
+    getAllCustomers,
+    createCustomer,
+  } = useCustomerService();
+  const { getTasks, createTask } = useTaskService();
+
   useEffect(() => {
     const loadDashboardStats = async () => {
       try {
-        const customers = await CustomerService.getAllCustomers();
+        const customers = await getAllCustomers();
         const totalCustomers = customers.length;
 
         const tasks = await getTasks();
@@ -68,6 +75,7 @@ const DashboardPage: React.FC = () => {
     };
 
     loadDashboardStats();
+    // eslint-disable-next-line
   }, []);
 
   const dashboardCards = [
@@ -118,11 +126,11 @@ const DashboardPage: React.FC = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await CustomerService.createCustomer(modalCustomer);
+      await createCustomer(modalCustomer);
       setShowAddModal(false);
       setModalCustomer(emptyCustomer);
       
-      const customers = await CustomerService.getAllCustomers();
+      const customers = await getAllCustomers();
       setStats(prev => ({
         ...prev,
         totalCustomers: customers.length
@@ -231,7 +239,7 @@ const DashboardPage: React.FC = () => {
                 <FontAwesomeIcon icon={faUser} className="me-2" />
                 Yeni Müşteri
               </button>
-              <button className="btn btn-success mb-2 w-100">
+              <button className="btn btn-success mb-2 w-100" disabled>
                 <FontAwesomeIcon icon={faShoppingBag} className="me-2" />
                 Yeni Görev
               </button>

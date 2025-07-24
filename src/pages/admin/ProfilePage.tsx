@@ -3,16 +3,23 @@ import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap'
 import { faSave, faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
-import { getUserProfile, updateUserProfile, changePassword, UserDto, UserUpdateRequest, ChangePasswordRequest } from '../../services/ProfileService';
+import { useProfileService } from '../../services/ProfileService';
 
-interface ProfileState extends UserDto {
-  // Password fields for UI only
+interface ProfileState {
+  firstname: string;
+  lastname: string;
+  email: string;
+  companyName: string;
+  phone?: string;
+  address?: string;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
 
 const Profile: React.FC = () => {
+  const { getUserProfile, updateUserProfile, changePassword } = useProfileService();
+
   const [profile, setProfile] = useState<ProfileState>({
     firstname: '',
     lastname: '',
@@ -53,7 +60,7 @@ const Profile: React.FC = () => {
     };
 
     loadProfile();
-  }, []);
+  }, [getUserProfile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -68,16 +75,15 @@ const Profile: React.FC = () => {
       setProfileUpdateLoading(true);
       setAlert(null);
 
-      const updateData: UserUpdateRequest = {
+      await updateUserProfile({
         firstname: profile.firstname,
         lastname: profile.lastname,
         email: profile.email,
         companyName: profile.companyName,
         phone: profile.phone,
         address: profile.address,
-      };
+      });
 
-      await updateUserProfile(updateData);
       setAlert({
         type: 'success',
         message: 'Profil bilgileri başarıyla güncellendi'
@@ -105,14 +111,12 @@ const Profile: React.FC = () => {
         return;
       }
 
-      const passwordData: ChangePasswordRequest = {
+      await changePassword({
         currentPassword: profile.currentPassword,
         newPassword: profile.newPassword,
         confirmationPassword: profile.confirmPassword,
-      };
+      });
 
-      await changePassword(passwordData);
-      
       setProfile(prevState => ({
         ...prevState,
         currentPassword: '',
@@ -149,7 +153,7 @@ const Profile: React.FC = () => {
   return (
     <Container className="py-4">
       <PageHeader title="Profil Sayfası" icon={faUser} />
-      
+
       {alert && (
         <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
           {alert.message}
@@ -167,10 +171,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Ad</Form.Label>
-                    <Form.Control 
-                      type="text" 
-                      name="firstname" 
-                      value={profile.firstname} 
+                    <Form.Control
+                      type="text"
+                      name="firstname"
+                      value={profile.firstname}
                       onChange={handleChange}
                       disabled={profileUpdateLoading}
                     />
@@ -179,10 +183,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Soyad</Form.Label>
-                    <Form.Control 
-                      type="text" 
-                      name="lastname" 
-                      value={profile.lastname} 
+                    <Form.Control
+                      type="text"
+                      name="lastname"
+                      value={profile.lastname}
                       onChange={handleChange}
                       disabled={profileUpdateLoading}
                     />
@@ -191,10 +195,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Telefon</Form.Label>
-                    <Form.Control 
-                      type="text" 
-                      name="phone" 
-                      value={profile.phone || ''} 
+                    <Form.Control
+                      type="text"
+                      name="phone"
+                      value={profile.phone || ''}
                       onChange={handleChange}
                       disabled={profileUpdateLoading}
                     />
@@ -203,10 +207,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>E-posta</Form.Label>
-                    <Form.Control 
-                      type="email" 
-                      name="email" 
-                      value={profile.email} 
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      value={profile.email}
                       onChange={handleChange}
                       disabled={profileUpdateLoading}
                     />
@@ -215,10 +219,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Şirket Adı</Form.Label>
-                    <Form.Control 
-                      type="text" 
-                      name="companyName" 
-                      value={profile.companyName} 
+                    <Form.Control
+                      type="text"
+                      name="companyName"
+                      value={profile.companyName}
                       onChange={handleChange}
                       disabled={profileUpdateLoading}
                     />
@@ -232,14 +236,15 @@ const Profile: React.FC = () => {
                       name="address"
                       value={profile.address || ''}
                       onChange={handleChange}
-                      rows={2}
+                      rows={3}
                       disabled={profileUpdateLoading}
+                      style={{ resize: 'vertical', minHeight: 60 }}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="d-flex justify-content-end align-items-end">
-                  <Button 
-                    className='btn btn-success' 
+                  <Button
+                    className='btn btn-success'
                     onClick={handleProfileUpdate}
                     disabled={profileUpdateLoading}
                   >
@@ -259,7 +264,7 @@ const Profile: React.FC = () => {
             </Card.Body>
           </Card>
         </Col>
-        
+
         <Col md={12}>
           <Card className="mb-4">
             <Card.Header>
@@ -270,10 +275,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Mevcut Şifre</Form.Label>
-                    <Form.Control 
-                      type="password" 
-                      name="currentPassword" 
-                      value={profile.currentPassword} 
+                    <Form.Control
+                      type="password"
+                      name="currentPassword"
+                      value={profile.currentPassword}
                       onChange={handleChange}
                       disabled={passwordChangeLoading}
                     />
@@ -282,10 +287,10 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Yeni Şifre</Form.Label>
-                    <Form.Control 
-                      type="password" 
-                      name="newPassword" 
-                      value={profile.newPassword} 
+                    <Form.Control
+                      type="password"
+                      name="newPassword"
+                      value={profile.newPassword}
                       onChange={handleChange}
                       disabled={passwordChangeLoading}
                     />
@@ -294,18 +299,18 @@ const Profile: React.FC = () => {
                 <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Yeni Şifreyi Tekrarla</Form.Label>
-                    <Form.Control 
-                      type="password" 
-                      name="confirmPassword" 
-                      value={profile.confirmPassword} 
+                    <Form.Control
+                      type="password"
+                      name="confirmPassword"
+                      value={profile.confirmPassword}
                       onChange={handleChange}
                       disabled={passwordChangeLoading}
                     />
                   </Form.Group>
                 </Col>
               </Row>
-              <Button 
-                className='btn btn-success' 
+              <Button
+                className='btn btn-success'
                 onClick={handlePasswordChange}
                 disabled={passwordChangeLoading || !profile.currentPassword || !profile.newPassword || !profile.confirmPassword}
               >
@@ -328,4 +333,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile;
+export default Profile

@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { useToken } from '../utils/TokenContext';
 
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed] = useState(false);
+  const { setAccessToken, setRefreshToken } = useToken();
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    setAccessToken(null);
+    setRefreshToken(null);
     navigate('/login');
   };
 
-  // Listen to sidebar collapse state via callback
-  const handleSidebarCollapse = (isCollapsed: boolean) => {
-    setCollapsed(isCollapsed);
-  };
+  // const handleSidebarCollapse = (isCollapsed: boolean) => {
+  //   setCollapsed(isCollapsed);
+  // };
 
   return (
     <div>

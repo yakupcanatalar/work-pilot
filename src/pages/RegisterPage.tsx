@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { registerUser } from '../services/UserService';
+import { useUserService } from '../services/UserService';
+import { useToken } from '../utils/TokenContext';
 import '../assets/styles/login.css';
 
 const RegisterPage: React.FC = () => {
@@ -19,8 +20,10 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { registerUser } = useUserService();
+  const { setAccessToken, setRefreshToken } = useToken();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -28,7 +31,6 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Password confirmation check
     if (formData.password !== formData.confirmationPassword) {
       setError('Şifreler eşleşmiyor');
       return;
@@ -39,8 +41,8 @@ const RegisterPage: React.FC = () => {
 
     try {
       const response = await registerUser(formData);
-      localStorage.setItem('accessToken', response.access_token);
-      localStorage.setItem('refreshToken', response.refresh_token);
+      setAccessToken(response.access_token);
+      setRefreshToken(response.refresh_token);
       navigate('/admin');
     } catch (err: any) {
       const message = err.response?.data?.message || 'Kayıt sırasında bir hata oluştu';
@@ -112,7 +114,6 @@ const RegisterPage: React.FC = () => {
               </Col>
             </Row>
 
-
             <Row>
               <Col>
                 <Form.Group className="mb-3">
@@ -125,7 +126,6 @@ const RegisterPage: React.FC = () => {
                   />
                 </Form.Group>
               </Col>
-
             </Row>
 
             <Form.Group className="mb-3">
@@ -136,7 +136,6 @@ const RegisterPage: React.FC = () => {
                 onChange={handleChange}
                 className="login-input"
                 as="textarea"
-
               />
             </Form.Group>
 

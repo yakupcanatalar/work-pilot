@@ -3,21 +3,11 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner, Modal, Alert, Badge, Nav, Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
-import {
-  searchOrders,
-  startOrder,
-  cancelOrder,
-  completeOrder,
-  revertOrder,
-  moveToNextStage,
-  moveToPreviousStage,
-  getOrderById
-} from '../../services/OrderService';
+import { useOrderService } from '../../services/OrderService';
 import { OrderSearchRequest, Order, OrderDetail, OrderStatus } from '../../dtos/OrderDto';
 import '../../assets/styles/flow.css';
 import StageFlow from '../../components/StageFlow';
-import { getTaskById } from '../../services/TaskService';
-
+import { useTaskService } from '../../services/TaskService';
 
 interface ExtendedOrder extends Order {
   customerName?: string;
@@ -33,6 +23,18 @@ interface ColumnFilter {
 }
 
 const OrderPage: React.FC = () => {
+  const {
+    searchOrders,
+    startOrder,
+    cancelOrder,
+    completeOrder,
+    revertOrder,
+    moveToNextStage,
+    moveToPreviousStage,
+    getOrderById
+  } = useOrderService();
+  const { getTaskById } = useTaskService();
+
   const [orders, setOrders] = useState<ExtendedOrder[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,6 +56,7 @@ const OrderPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line
   }, [currentPage]);
 
   const fetchOrders = async () => {
@@ -74,7 +77,7 @@ const OrderPage: React.FC = () => {
         taskCurrentStageId: detail.currentTaskStage?.id ?? null,
         status: detail.status,
         hasNextStage: detail.hasNextStage,
-        token: '', 
+        token: '',
         createdDate: detail.createdDate,
         updatedDate: detail.updatedDate,
         customerName: detail.customer.name,
@@ -180,22 +183,22 @@ const OrderPage: React.FC = () => {
     setActionLoading(null);
   };
 
-const handleShowDetail = async (order: ExtendedOrder) => {
-  setLoading(true);
-  try {
-    const orderDetail = await getOrderById(order.id);
-    setDetailOrder(orderDetail);
+  const handleShowDetail = async (order: ExtendedOrder) => {
+    setLoading(true);
+    try {
+      const orderDetail = await getOrderById(order.id);
+      setDetailOrder(orderDetail);
 
-const taskDetail = await getTaskById(orderDetail.task.id) as { stages?: any[] };
-orderDetail.taskStages = taskDetail.stages || [];
+      const taskDetail = await getTaskById(orderDetail.task.id) as { stages?: any[] };
+      orderDetail.taskStages = taskDetail.stages || [];
 
-    setShowDetail(true);
-  } catch (err) {
-    console.error('Error fetching order detail:', err);
-    setError('Sipariş detayları yüklenirken hata oluştu.');
-  }
-  setLoading(false);
-};
+      setShowDetail(true);
+    } catch (err) {
+      console.error('Error fetching order detail:', err);
+      setError('Sipariş detayları yüklenirken hata oluştu.');
+    }
+    setLoading(false);
+  };
 
   const handleCloseDetail = () => {
     setShowDetail(false);

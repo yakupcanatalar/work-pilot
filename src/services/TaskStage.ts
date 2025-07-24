@@ -1,8 +1,5 @@
-import axios from "axios";
 import TaskStageDto, { TaskStageStatus } from "../dtos/TaskStageDto";
-
-const API_URL = process.env.REACT_APP_API_URL;
-const TASK_STAGE_URL = `${API_URL}task-stage`;
+import { useAxios } from "../utils/TokenService";
 
 export const TaskStageRequestValidator = {
   TASK_STAGE_NAME_MIN_LENGTH: 3,
@@ -10,119 +7,77 @@ export const TaskStageRequestValidator = {
   NOTE_MAX_LENGTH: 250,
 };
 
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-});
+const TASK_STAGE_URL = "/task-stage";
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      if (!config.headers) {
-        config.headers = {};
-      }
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+export const useTaskStageService = () => {
+  const axiosInstance = useAxios();
 
-export const getAllTaskStages = async (): Promise<TaskStageDto[]> => {
-  try {
+  const getAllTaskStages = async (): Promise<TaskStageDto[]> => {
     const response = await axiosInstance.get(TASK_STAGE_URL);
     const allStages = response.data as TaskStageDto[];
     return allStages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const getTaskStageById = async (id: number): Promise<TaskStageDto> => {
-  try {
+  const getTaskStageById = async (id: number): Promise<TaskStageDto> => {
     const response = await axiosInstance.get(`${TASK_STAGE_URL}/${id}`);
     return response.data as TaskStageDto;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const createTaskStage = async (
-  stageData: {
-    name: string;
-    note?: string;
-  }
-): Promise<TaskStageDto> => {
-  try {
+  const createTaskStage = async (
+    stageData: {
+      name: string;
+      note?: string;
+    }
+  ): Promise<TaskStageDto> => {
     const stageToCreate = {
       name: stageData.name,
       note: stageData.note,
       status: TaskStageStatus.ACTIVE
     };
-    
     const response = await axiosInstance.post(TASK_STAGE_URL, stageToCreate);
     return response.data as TaskStageDto;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const updateTaskStage = async (
-  id: number,
-  stageData: {
-    name: string;
-    note?: string;
-  }
-): Promise<TaskStageDto> => {
-  try {
+  const updateTaskStage = async (
+    id: number,
+    stageData: {
+      name: string;
+      note?: string;
+    }
+  ): Promise<TaskStageDto> => {
     const stageToUpdate = {
       name: stageData.name,
       note: stageData.note,
       status: TaskStageStatus.ACTIVE // Güncelleme sırasında status ACTIVE kalır
     };
-    
     const response = await axiosInstance.put(
       `${TASK_STAGE_URL}/${id}`,
       stageToUpdate
     );
     return response.data as TaskStageDto;
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const deleteTaskStage = async (id: number): Promise<void> => {
-  try {
+  const deleteTaskStage = async (id: number): Promise<void> => {
     // Önce stage'i getir
     const stage = await getTaskStageById(id);
-    
     const stageToUpdate = {
       name: stage.name,
       note: stage.note,
       status: TaskStageStatus.DELETED
     };
-    
     await axiosInstance.put(`${TASK_STAGE_URL}/${id}`, stageToUpdate);
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export const hardDeleteTaskStage = async (id: number): Promise<void> => {
-  try {
+  const hardDeleteTaskStage = async (id: number): Promise<void> => {
     await axiosInstance.delete(`${TASK_STAGE_URL}/${id}`);
-  } catch (error) {
-    throw error;
-  }
-};
+  };
 
-export default {
-  getAllTaskStages,
-  getTaskStageById,
-  createTaskStage,
-  updateTaskStage,
-  deleteTaskStage,
-  hardDeleteTaskStage,
+  return {
+    getAllTaskStages,
+    getTaskStageById,
+    createTaskStage,
+    updateTaskStage,
+    deleteTaskStage,
+    hardDeleteTaskStage,
+    };
 };

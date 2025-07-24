@@ -66,10 +66,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
           <FontAwesomeIcon icon={faShoppingBag} className="me-2" />
           {!collapsed && 'Siparişler'}
         </Nav.Link>
-        <Nav.Link as={Link} to="/admin/statistics" className="mb-2 rounded" title="İstatistikler">
+        {/* <Nav.Link as={Link} to="/admin/statistics" className="mb-2 rounded" title="İstatistikler">
           <FontAwesomeIcon icon={faChartBar} className="me-2" />
           {!collapsed && 'İstatistikler'}
-        </Nav.Link>
+        </Nav.Link> */}
       </Nav>
       {/* User Dropdown at Bottom */}
       <div className="p-3 border-top mt-auto">

@@ -3,15 +3,21 @@ import React, { useEffect, useState } from 'react';
 import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner, Modal, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
-import { getTasks, createTask, updateTaskById, deleteTaskById } from '../../services/TaskService';
+import { useTaskService } from '../../services/TaskService';
 import FlowBuilder from './FlowBuilder';
-import StageFlow from '../../components/StageFlow'; // StageFlow komponentini import et
+import StageFlow from '../../components/StageFlow';
 import '../../assets/styles/flow.css';
 import TaskDto from '../../dtos/TaskDto';
 import TaskStageDto, { TaskStageStatus } from '../../dtos/TaskStageDto';
 
-
 const WorkflowPage: React.FC = () => {
+  const {
+    getTasks,
+    createTask,
+    updateTaskById,
+    deleteTaskById,
+  } = useTaskService();
+
   const [tasks, setTasks] = useState<TaskDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,6 +34,7 @@ const WorkflowPage: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
+    // eslint-disable-next-line
   }, []);
 
   const fetchTasks = async () => {
@@ -84,7 +91,7 @@ const WorkflowPage: React.FC = () => {
 
     try {
       const activeStages = flowData.stages.filter(stage => stage.status === TaskStageStatus.ACTIVE);
-      
+
       const taskData = {
         name: flowData.name,
         note: flowData.note,
@@ -258,73 +265,73 @@ const WorkflowPage: React.FC = () => {
                               {(currentPage - 1) * pageSize + index + 1}
                             </td>
                             <td>
-                            <div
-                              style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                              onClick={() => handleShowDetail(task)}
-                            >
-                              <span className="fw-semibold text-primary">{task.name}</span>
-                              <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" size="sm" />
-                            </div>
-                          </td>
-                          <td>
-                            <span className="text-muted">{task.note}</span>
-                          </td>
-                          <td>
-                            <span className="text-muted">{getFlowSummary(task)}</span>
-                          </td>
-                          <td>
-                            {activeStages.length > 0 ? (
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                                {activeStages.slice(0, 3).map(stage => (
-                                  <span key={stage.id} className="badge bg-light text-dark border">
-                                    {stage.name}
-                                  </span>
-                                ))}
-                                {activeStages.length > 3 && (
-                                  <span className="badge bg-secondary">
-                                    +{activeStages.length - 3} daha
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-muted">-</span>
-                            )}
-                          </td>
-                          <td>
-                            <div className="d-flex gap-1 justify-content-center">
-                              <Button
-                                variant="outline-info"
-                                size="sm"
+                              <div
+                                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                                 onClick={() => handleShowDetail(task)}
-                                title="Detay"
                               >
-                                <FontAwesomeIcon icon={faInfoCircle} />
-                              </Button>
-                              <Button
-                                variant="outline-warning"
-                                size="sm"
-                                onClick={() => handleShowEditModal(task)}
-                                title="Düzenle"
-                                disabled={loading}
-                              >
-                                <FontAwesomeIcon icon={faEdit} />
-                              </Button>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
-                                onClick={() => {
-                                  if (task?.id !== undefined) {
-                                    handleDelete(task.id);
-                                  }
-                                }}
-                                title="Sil"
-                                disabled={loading}
-                              >
-                                <FontAwesomeIcon icon={faTrash} />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
+                                <span className="fw-semibold text-primary">{task.name}</span>
+                                <FontAwesomeIcon icon={faInfoCircle} className="ms-2 text-info" size="sm" />
+                              </div>
+                            </td>
+                            <td>
+                              <span className="text-muted">{task.note}</span>
+                            </td>
+                            <td>
+                              <span className="text-muted">{getFlowSummary(task)}</span>
+                            </td>
+                            <td>
+                              {activeStages.length > 0 ? (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                  {activeStages.slice(0, 3).map(stage => (
+                                    <span key={stage.id} className="badge bg-light text-dark border">
+                                      {stage.name}
+                                    </span>
+                                  ))}
+                                  {activeStages.length > 3 && (
+                                    <span className="badge bg-secondary">
+                                      +{activeStages.length - 3} daha
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-muted">-</span>
+                              )}
+                            </td>
+                            <td>
+                              <div className="d-flex gap-1 justify-content-center">
+                                <Button
+                                  variant="outline-info"
+                                  size="sm"
+                                  onClick={() => handleShowDetail(task)}
+                                  title="Detay"
+                                >
+                                  <FontAwesomeIcon icon={faInfoCircle} />
+                                </Button>
+                                <Button
+                                  variant="outline-warning"
+                                  size="sm"
+                                  onClick={() => handleShowEditModal(task)}
+                                  title="Düzenle"
+                                  disabled={loading}
+                                >
+                                  <FontAwesomeIcon icon={faEdit} />
+                                </Button>
+                                <Button
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => {
+                                    if (task?.id !== undefined) {
+                                      handleDelete(task.id);
+                                    }
+                                  }}
+                                  title="Sil"
+                                  disabled={loading}
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
                         );
                       })
                     )}
@@ -371,7 +378,7 @@ const WorkflowPage: React.FC = () => {
         onSave={handleSaveFlow}
         task={editingTask}
       />
-      
+
       <Modal show={showDelete} onHide={() => setShowDelete(false)} centered>
         <Card className="shadow-sm m-0">
           <Card.Header>
@@ -419,8 +426,8 @@ const WorkflowPage: React.FC = () => {
                 </table>
 
                 <p><strong>Aşamalar:</strong></p>
-                <StageFlow 
-                  stages={getActiveStages(detailTask.stages)} 
+                <StageFlow
+                  stages={getActiveStages(detailTask.stages)}
                 />
               </>
             )}

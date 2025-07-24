@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/UserService';
+import { useUserService } from '../services/UserService';
 import '../assets/styles/login.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFish } from '@fortawesome/free-solid-svg-icons';
+import { useToken } from '../utils/TokenContext';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { loginUser } = useUserService();
+  const { setAccessToken, setRefreshToken } = useToken();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,8 +31,8 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await loginUser(formData);
-      localStorage.setItem('accessToken', response.access_token);
-      localStorage.setItem('refreshToken', response.refresh_token);
+      setAccessToken(response.access_token);
+      setRefreshToken(response.refresh_token);
       navigate('/admin');
     } catch (err: any) {
       const message = err.response?.data?.message || 'Giriş sırasında bir hata oluştu';
