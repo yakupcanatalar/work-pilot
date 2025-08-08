@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Row, Col } from 'react-bootstrap';
-import { faSave, faCog, faSpaghettiMonsterFlying } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../components/PageHeader';
 
