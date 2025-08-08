@@ -15,6 +15,7 @@ import FlowBuilder from '../admin/FlowBuilder';
 import { useCustomerService } from '../../services/CustomerService';
 import TaskStageDto from '../../dtos/TaskStageDto';
 import { useTaskService } from '../../services/TaskService';
+import { useDashboardService } from '../../services/DashboardService';
 import CustomerDto from '../../dtos/CustomerDto';
 import { ErrorMessage } from '../../utils/ErrorMessage';
 
@@ -32,15 +33,13 @@ interface DashboardStats {
   totalCustomers: number;
   activeTasks: number;
   workflows: number;
-  productivity: string;
 }
 
 const DashboardPage: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     activeTasks: 0,
-    workflows: 0,
-    productivity: '0%'
+    workflows: 0
   });
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -55,23 +54,19 @@ const DashboardPage: React.FC = () => {
     createCustomer,
   } = useCustomerService();
   const { getTasks, createTask } = useTaskService();
+  const { getDashboardSummary } = useDashboardService();
 
   useEffect(() => {
     const loadDashboardStats = async () => {
       try {
-        const customers = await getAllCustomers();
-        const totalCustomers = customers.length;
-
-        const tasks = await getTasks();
-        const workflows = tasks.length;
-
-        setStats(prev => ({
-          ...prev,
-          totalCustomers,
-          workflows
-        }));
+        const summaryData = await getDashboardSummary();
+        setStats({
+          totalCustomers: summaryData.activeCustomers,
+          activeTasks: summaryData.activeTasks,
+          workflows: summaryData.activeOrders
+        });
       } catch (error) {
-                console.error('Dashboard istatistikleri yüklenirken hata:', error);
+        console.error('Dashboard istatistikleri yüklenirken hata:', error);
         setError(ErrorMessage.get(error));
       }
     };
@@ -81,29 +76,23 @@ const DashboardPage: React.FC = () => {
   }, []);
 
   const dashboardCards = [
-    { 
-      title: 'Toplam Aktif Müşteri', 
-      value: stats.totalCustomers.toLocaleString(), 
-      icon: faUsers, 
-      color: 'primary' 
+    {
+      title: 'Toplam Aktif Müşteri',
+      value: stats.totalCustomers.toLocaleString(),
+      icon: faUsers,
+      color: 'primary'
     },
-    { 
-      title: 'Toplam Aktif Sipariş Sayısı', 
-      value: stats.activeTasks.toString(), 
-      icon: faShoppingBag, 
-      color: 'success' 
+    {
+      title: 'Toplam Aktif Görev Sayısı',
+      value: stats.activeTasks.toString(),
+      icon: faShoppingBag,
+      color: 'success'
     },
-    { 
-      title: 'Toplam Aktif İş Akışı', 
-      value: stats.workflows.toString(), 
-      icon: faProjectDiagram, 
-      color: 'info' 
-    },
-    { 
-      title: 'Üretkenlik Oranı', 
-      value: stats.productivity, 
-      icon: faChartLine, 
-      color: 'warning' 
+    {
+      title: 'Toplam Aktif Sipariş Sayısı',
+      value: stats.workflows.toString(),
+      icon: faProjectDiagram,
+      color: 'info'
     }
   ];
 
@@ -131,14 +120,16 @@ const DashboardPage: React.FC = () => {
       await createCustomer(modalCustomer);
       setShowAddModal(false);
       setModalCustomer(emptyCustomer);
-      
-      const customers = await getAllCustomers();
-      setStats(prev => ({
-        ...prev,
-        totalCustomers: customers.length
-      }));
+
+      // Dashboard istatistiklerini yeniden yükle
+      const summaryData = await getDashboardSummary();
+      setStats({
+        totalCustomers: summaryData.activeCustomers,
+        activeTasks: summaryData.activeTasks,
+        workflows: summaryData.activeOrders
+      });
     } catch (err) {
-            console.error('Error saving customer:', err);
+      console.error('Error saving customer:', err);
       setError(ErrorMessage.get(err));
     }
     setLoading(false);
@@ -166,15 +157,17 @@ const DashboardPage: React.FC = () => {
 
       await createTask(taskData);
       setSuccess('İş akışı başarıyla oluşturuldu!');
-      
+
       setShowFlowBuilder(false);
-      
-      const tasks = await getTasks();
-      setStats(prev => ({
-        ...prev,
-        workflows: tasks.length
-      }));
-      
+
+      // Dashboard istatistiklerini yeniden yükle
+      const summaryData = await getDashboardSummary();
+      setStats({
+        totalCustomers: summaryData.activeCustomers,
+        activeTasks: summaryData.activeTasks,
+        workflows: summaryData.activeOrders
+      });
+
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error saving workflow:', error);
@@ -242,11 +235,7 @@ const DashboardPage: React.FC = () => {
                 <FontAwesomeIcon icon={faUser} className="me-2" />
                 Yeni Müşteri
               </button>
-              <button className="btn btn-success mb-2 w-100" disabled>
-                <FontAwesomeIcon icon={faShoppingBag} className="me-2" />
-                Yeni Görev
-              </button>
-              <button 
+              <button
                 className="btn btn-info w-100"
                 onClick={handleShowFlowBuilder}
               >
