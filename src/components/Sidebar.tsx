@@ -65,12 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
           <FontAwesomeIcon icon={faShoppingBag} className="me-2" />
           {!collapsed && 'Siparişler'}
         </Nav.Link>
-        {/* <Nav.Link as={Link} to="/admin/statistics" className="mb-2 rounded" title="İstatistikler">
-          <FontAwesomeIcon icon={faChartBar} className="me-2" />
-          {!collapsed && 'İstatistikler'}
-        </Nav.Link> */}
       </Nav>
-      {/* User Dropdown at Bottom */}
       <div className="p-3 border-top mt-auto">
         <Dropdown drop="up">
           <Dropdown.Toggle
@@ -82,17 +77,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
             <img
               src={require('../assets/images/pp.png')}
               alt="Profile"
-              width="32"
-              height="32"
+              width="25"
+              height="25"
               className="rounded-circle me-2"
             />
-            {!collapsed && <strong>Çağrı ATALAR</strong>}
           </Dropdown.Toggle>
           <Dropdown.Menu className="text-small shadow" aria-labelledby="dropdownUser2">
             <Dropdown.Item className="mb-2 rounded" as={Link} to="/admin/settings">Ayarlar</Dropdown.Item>
             <Dropdown.Item className="mb-2 rounded" as={Link} to="/admin/profile">Profilim</Dropdown.Item>
-            <Dropdown.Item className="mb-2 rounded" as={Link} to="/contact">Hata Bildir</Dropdown.Item>
-            <Dropdown.Item className="mb-2 rounded" as={Link} to="/about">S.S.S</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={onLogout}>Çıkış</Dropdown.Item>
           </Dropdown.Menu>

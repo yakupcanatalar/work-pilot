@@ -62,7 +62,7 @@ const Profile: React.FC = () => {
     };
 
     loadProfile();
-  }, [getUserProfile]);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

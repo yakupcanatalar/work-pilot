@@ -1,7 +1,6 @@
 import { useAxios } from "../utils/TokenService";
 import { ErrorMessage } from "../utils/ErrorMessage";
 
-// Types matching your backend DTOs
 export interface UserDto {
   firstname: string;
   lastname: string;

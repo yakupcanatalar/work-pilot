@@ -193,7 +193,7 @@ const DashboardPage: React.FC = () => {
 
       <Row className="mb-4">
         {dashboardCards.map((stat, index) => (
-          <Col key={index} md={3} sm={6} className="mb-3">
+          <Col key={index} md={4} sm={6} className="mb-3">
             <Card className={`stat-card bg-${stat.color}-light`}>
               <Card.Body>
                 <div className="stat-icon">

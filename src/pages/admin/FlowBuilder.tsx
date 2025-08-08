@@ -344,9 +344,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
                 </Card.Header>
                 <Card.Body>
                   <Form.Group className="mb-2">
-                    <Form.Label className="fw-semibold mb-1 fs-7 text-secondary">
-                      Aşama Adı
-                    </Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="Aşama adı"
@@ -359,9 +356,6 @@ const FlowBuilder: React.FC<FlowBuilderProps> = ({ show, onHide, onSave, task })
                     />
                   </Form.Group>
                   <Form.Group className="mb-2">
-                    <Form.Label className="fw-semibold mb-1 fs-7 text-secondary">
-                      Not
-                    </Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="Not (opsiyonel)"
