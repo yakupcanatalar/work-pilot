@@ -5,7 +5,6 @@ import {
   faUsers,
   faShoppingBag,
   faProjectDiagram,
-  faChartLine,
   faTachometerAlt,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -50,10 +49,9 @@ const DashboardPage: React.FC = () => {
   const [success, setSuccess] = useState<string>('');
 
   const {
-    getAllCustomers,
     createCustomer,
   } = useCustomerService();
-  const { getTasks, createTask } = useTaskService();
+  const { createTask } = useTaskService();
   const { getDashboardSummary } = useDashboardService();
 
   useEffect(() => {
