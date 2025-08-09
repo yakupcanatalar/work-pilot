@@ -32,14 +32,26 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 .footer-custom a:hover {
-  color: #0d6efd; /* Bootstrap'in mavi tonu */
+  color: #0d6efd;
+  /* Bootstrap'in mavi tonu */
   text-decoration: underline;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* StageFlow.css */
