@@ -14,6 +14,7 @@ import StatisticsPage from "./pages/admin/Statistics";
 import WorkflowPage from "./pages/admin/Workflow";
 import SettingsPage from "./pages/Settings";
 import OrderPage from "./pages/admin/Order";
+import OrderMonitor from "./pages/OrderMonitor";
 import { TokenProvider } from "./utils/TokenContext";
 
 // PrivateRoute component to protect admin routes
@@ -52,6 +53,7 @@ const AppContent: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/monitor/:orderId" element={<OrderMonitor />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>

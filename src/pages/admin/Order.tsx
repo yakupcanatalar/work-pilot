@@ -1,6 +1,7 @@
-import { faShoppingCart, faPlay, faStop, faCheck, faUndo, faChevronRight, faChevronLeft, faInfoCircle, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faPlay, faStop, faCheck, faUndo, faChevronRight, faChevronLeft, faInfoCircle, faFilter, faTimes, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState, useMemo } from 'react';
 import { Table, Card, Button, Form, InputGroup, Container, Row, Col, Spinner, Modal, Alert, Badge, Nav, Dropdown } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageHeader from '../../components/PageHeader';
 import { useOrderService } from '../../services/OrderService';
@@ -566,6 +567,20 @@ const OrderPage: React.FC = () => {
                                 <FontAwesomeIcon icon={faInfoCircle} />
                               </Button>
 
+                              <Link
+                                to={`/monitor/${order.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Button
+                                  variant="outline-secondary"
+                                  size="sm"
+                                  title="Monitör Sayfasını Aç"
+                                >
+                                  <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                </Button>
+                              </Link>
+
                               {activeTab === 'active' && (
                                 <>
                                   <Button
@@ -751,7 +766,17 @@ const OrderPage: React.FC = () => {
             )}
           </Card.Body>
 
-          <Card.Footer className="d-flex justify-content-end">
+          <Card.Footer className="d-flex justify-content-between">
+            <Link
+              to={`/monitor/${detailOrder?.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline-primary">
+                <FontAwesomeIcon icon={faExternalLinkAlt} className="me-2" />
+                Monitör Sayfasını Aç
+              </Button>
+            </Link>
             <Button variant="secondary" onClick={handleCloseDetail}>
               Kapat
             </Button>
