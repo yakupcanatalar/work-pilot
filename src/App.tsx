@@ -25,7 +25,9 @@ const PrivateRoute: React.FC = () => {
 
 const AppContent: React.FC = () => {
   const location = useLocation();
-  const showNavigation = !location.pathname.startsWith("/admin");
+  const showNavigation =
+    !location.pathname.startsWith("/admin") &&
+    !location.pathname.startsWith("/status/");
 
   return (
     <>
@@ -53,14 +55,14 @@ const AppContent: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/monitor/:orderId" element={<OrderMonitor />} />
+            <Route path="/status/:orderId" element={<OrderMonitor />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>
       </TokenProvider>
     </>
   );
-};
+}
 
 const App: React.FC = () => {
   return (

@@ -566,21 +566,6 @@ const OrderPage: React.FC = () => {
                               >
                                 <FontAwesomeIcon icon={faInfoCircle} />
                               </Button>
-
-                              <Link
-                                to={`/monitor/${order.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Button
-                                  variant="outline-secondary"
-                                  size="sm"
-                                  title="Monitör Sayfasını Aç"
-                                >
-                                  <FontAwesomeIcon icon={faExternalLinkAlt} />
-                                </Button>
-                              </Link>
-
                               {activeTab === 'active' && (
                                 <>
                                   <Button
@@ -768,13 +753,13 @@ const OrderPage: React.FC = () => {
 
           <Card.Footer className="d-flex justify-content-between">
             <Link
-              to={`/monitor/${detailOrder?.id}`}
+              to={`/status/${detailOrder?.id}`}
               target="_blank"
               rel="noopener noreferrer"
             >
               <Button variant="outline-primary">
                 <FontAwesomeIcon icon={faExternalLinkAlt} className="me-2" />
-                Monitör Sayfasını Aç
+                Sipariş Detay
               </Button>
             </Link>
             <Button variant="secondary" onClick={handleCloseDetail}>
