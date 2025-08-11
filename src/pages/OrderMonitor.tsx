@@ -19,16 +19,16 @@ const OrderView: React.FC = () => {
                 return;
             }
 
-            console.log('OrderMonitor: Starting to fetch order with token:', orderId);
+
             setLoading(true);
             setError(null);
 
             try {
                 const orderData = await getOrderByToken(orderId);
-                console.log('OrderMonitor: Successfully fetched order:', orderData);
+
                 setOrder(orderData);
             } catch (err: any) {
-                console.error('OrderMonitor: Error fetching order:', err);
+
                 setError(err.message || 'Sipariş yüklenirken bir hata oluştu');
             } finally {
                 setLoading(false);
@@ -140,7 +140,7 @@ const OrderView: React.FC = () => {
                 statusElement.textContent = '❌ Bağlantı hatası';
                 statusElement.style.color = 'red';
             }
-            console.error('Backend connection test failed:', error);
+
         }
     };
 
