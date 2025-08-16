@@ -117,32 +117,6 @@ const OrderView: React.FC = () => {
         }
     };
 
-    const testBackendConnection = async () => {
-        const statusElement = document.getElementById('backend-status');
-        if (statusElement) {
-            statusElement.textContent = 'Test ediliyor...';
-            statusElement.style.color = 'orange';
-        }
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/customer-order/${orderId}`);
-            if (statusElement) {
-                if (response.ok) {
-                    statusElement.textContent = '✅ Bağlantı başarılı';
-                    statusElement.style.color = 'green';
-                } else {
-                    statusElement.textContent = `❌ HTTP ${response.status}`;
-                    statusElement.style.color = 'red';
-                }
-            }
-        } catch (error) {
-            if (statusElement) {
-                statusElement.textContent = '❌ Bağlantı hatası';
-                statusElement.style.color = 'red';
-            }
-
-        }
-    };
 
     if (loading) {
         return (
@@ -194,29 +168,6 @@ const OrderView: React.FC = () => {
     return (
         <div className="min-vh-100 bg-light">
             <div className="container py-5" style={{ maxWidth: '900px' }}>
-                {/* Header Section */}
-                <div className="text-center mb-5">
-                    <h1 className="display-5 fw-bold text-dark mb-3">Sipariş Takip Sistemi</h1>
-                    <p className="lead text-muted">Siparişinizin güncel durumunu takip edin</p>
-
-                    {/* Debug Info */}
-                    <div className="mt-3 p-3 bg-light rounded">
-                        <small className="text-muted">
-                            <strong>Debug Bilgileri:</strong><br />
-                            Token: {orderId}<br />
-                            API URL: http://localhost:8080/api/v1/customer-order/{orderId}<br />
-                            Backend Status: <span id="backend-status">Kontrol ediliyor...</span>
-                        </small>
-                        <button
-                            className="btn btn-sm btn-outline-secondary ms-2"
-                            onClick={() => testBackendConnection()}
-                        >
-                            Backend Bağlantısını Test Et
-                        </button>
-                    </div>
-                </div>
-
-                {/* Company and Customer Info */}
                 <div className="row g-4 mb-4">
                     <div className="col-md-6">
                         <div className="card shadow-sm h-100 border-0">

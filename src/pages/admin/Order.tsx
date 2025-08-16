@@ -730,25 +730,31 @@ const OrderPage: React.FC = () => {
                 </table>
 
                 <p><strong>İş Akışı Durumu:</strong></p>
-                <div className="alert alert-info">
-                  <strong>{detailOrder.task.name}</strong> iş akışında
-                  {detailOrder.currentTaskStage ? (
-                    <span> <strong>{detailOrder.currentTaskStage.name}</strong> aşamasındasınız.</span>
-                  ) : (
-                    <span> henüz bir aşamada değilsiniz.</span>
-                  )}
-                  {detailOrder.hasNextStage && (
-                    <div className="mt-2">
-                      <small className="text-muted">Sonraki aşamaya geçilebilir.</small>
-                    </div>
-                  )}
-                </div>
-                <StageFlow
-                  stages={detailOrder.taskStages}
-                  currentStageId={detailOrder.currentTaskStage?.id}
-                ></StageFlow>
-              </>
-            )}
+      <div className="alert alert-info">
+        <strong>{detailOrder.task.name}</strong> iş akışında
+        {detailOrder.currentTaskStage ? (
+          <span> <strong>{detailOrder.currentTaskStage.name}</strong> aşamasındasınız.</span>
+        ) : (
+          <span> henüz bir aşamada değilsiniz.</span>
+        )}
+        {detailOrder.hasNextStage && (
+          <div className="mt-2">
+            <small className="text-muted">Sonraki aşamaya geçilebilir.</small>
+          </div>
+        )}
+      </div>
+      {detailOrder.status === OrderStatus.IN_PROGRESS &&
+        !detailOrder.hasNextStage && detailOrder.currentTaskStage && (
+        <Alert variant="warning" className="mb-3">
+          <strong>Son aşamadasınız.</strong> Siparişi tamamlamak için aşağıdaki <b>Tamamla</b> butonuna basınız.
+        </Alert>
+      )}
+      <StageFlow
+        stages={detailOrder.taskStages}
+        currentStageId={detailOrder.currentTaskStage?.id}
+      />
+    </>
+  )}
           </Card.Body>
 
           <Card.Footer className="d-flex justify-content-between">
